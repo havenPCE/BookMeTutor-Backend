@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.pce.BookMeTutor.Model.Dto.EmailRequest;
-import com.pce.BookMeTutor.Model.Dto.EmailResponse;
+import com.pce.BookMeTutor.Model.Dto.Requests.EmailRequest;
+import com.pce.BookMeTutor.Model.Dto.Responses.EmailResponse;
 import com.pce.BookMeTutor.Services.EmailService;
 
 @RestController
@@ -29,7 +29,7 @@ public class TestController {
 	public EmailResponse sendEmail(@RequestBody EmailRequest emailRequest) throws MessagingException, IOException {
 		
 		emailService.sendMail(emailRequest.getTo(), emailRequest.getSubject(), emailRequest.getText());
-		return new EmailResponse(emailRequest.getTo());
+		return new EmailResponse("Mail Sent to " + emailRequest.getTo());
 	}
 	
 	

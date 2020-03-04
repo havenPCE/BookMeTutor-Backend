@@ -1,4 +1,4 @@
-package com.pce.BookMeTutor.Model.Dto;
+package com.pce.BookMeTutor.Model.Dto.Requests;
 
 public class EmailRequest {
 	

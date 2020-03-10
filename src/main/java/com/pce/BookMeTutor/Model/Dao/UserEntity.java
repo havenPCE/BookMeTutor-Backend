@@ -18,7 +18,7 @@ import javax.persistence.CollectionTable;
 
 @Entity
 @Table(name="users")
-public class User implements Serializable {
+public class UserEntity implements Serializable {
 	
 	private static final long serialVersionUID = 7653478770835578197L;
 
@@ -51,14 +51,14 @@ public class User implements Serializable {
 	private boolean verified;
 	
 	@OneToMany(cascade = CascadeType.ALL)
-	private Set<Address> addresses;
+	private Set<AddressEntity> addresses;
 	
 	@OneToMany(cascade = CascadeType.ALL)
 	private Set<Booking> bookings;
 
 
-	public User(long id, String password, @Email String email, String fname, String lname, String gender,
-			Set<String> phones, boolean verified, Set<Address> addresses, Set<Booking> bookings) {
+	public UserEntity(long id, String password, @Email String email, String fname, String lname, String gender,
+			Set<String> phones, boolean verified, Set<AddressEntity> addresses, Set<Booking> bookings) {
 		super();
 		this.id = id;
 		this.password = password;
@@ -170,13 +170,13 @@ public class User implements Serializable {
 
 
 
-	public Set<Address> getAddresses() {
+	public Set<AddressEntity> getAddresses() {
 		return addresses;
 	}
 
 
 
-	public void setAddresses(Set<Address> addresses) {
+	public void setAddresses(Set<AddressEntity> addresses) {
 		this.addresses = addresses;
 	}
 
@@ -200,7 +200,7 @@ public class User implements Serializable {
 
 
 
-	public User() {
+	public UserEntity() {
 		super();
 	}
 	

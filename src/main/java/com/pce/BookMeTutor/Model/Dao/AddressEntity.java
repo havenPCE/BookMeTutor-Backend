@@ -14,7 +14,7 @@ import javax.persistence.GenerationType;
 
 @Entity
 @Table(name = "user_address")
-public class Address implements Serializable {
+public class AddressEntity implements Serializable {
 	
 
 	private static final long serialVersionUID = -8395838980363295033L;
@@ -36,7 +36,7 @@ public class Address implements Serializable {
 	private String pincode;
 	
 	@ManyToOne(cascade = CascadeType.ALL)
-	private User user;
+	private UserEntity user;
 
 	public long getId() {
 		return id;
@@ -78,11 +78,11 @@ public class Address implements Serializable {
 		this.pincode = pincode;
 	}
 
-	public User getUser() {
+	public UserEntity getUser() {
 		return user;
 	}
 
-	public void setUser(User user) {
+	public void setUser(UserEntity user) {
 		this.user = user;
 	}
 
@@ -90,7 +90,7 @@ public class Address implements Serializable {
 		return serialVersionUID;
 	}
 
-	public Address(long id, String line1, String line2, String city, String pincode, User user) {
+	public AddressEntity(long id, String line1, String line2, String city, String pincode, UserEntity user) {
 		super();
 		this.id = id;
 		this.line1 = line1;
@@ -100,7 +100,7 @@ public class Address implements Serializable {
 		this.user = user;
 	}
 
-	public Address() {
+	public AddressEntity() {
 		super();
 	}
 

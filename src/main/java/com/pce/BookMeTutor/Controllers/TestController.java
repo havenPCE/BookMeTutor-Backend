@@ -11,9 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.pce.BookMeTutor.Model.Dao.User;
 import com.pce.BookMeTutor.Model.Dto.Requests.EmailRequest;
-import com.pce.BookMeTutor.Model.Dto.Requests.UserRequest;
 import com.pce.BookMeTutor.Model.Dto.Responses.EmailResponse;
 import com.pce.BookMeTutor.Repo.UserRepo;
 import com.pce.BookMeTutor.Services.EmailService;
@@ -36,23 +34,6 @@ public class TestController {
 		emailService.sendMail(emailRequest.getTo(), emailRequest.getSubject(),
 				emailRequest.getText());
 		return new EmailResponse("Mail Sent to " + emailRequest.getTo());
-	}
-
-	@PostMapping("/user")
-	@ResponseBody
-	public User addUser(@RequestBody UserRequest userRequest) {
-
-		User user = new User();
-
-		user.setEmail(userRequest.getEmail());
-		user.setPassword(userRequest.getPassword());
-		user.setFname(userRequest.getFirst_name());
-		user.setLname(userRequest.getLast_name());
-		user.setGender(userRequest.getGender());
-		user.setPhones(userRequest.getPhone());
-
-		return userRepo.save(user);
-
 	}
 
 }

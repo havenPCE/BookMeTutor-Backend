@@ -30,7 +30,7 @@ public class Booking implements Serializable {
 	private long id;
 	
 	@ManyToOne
-	private User user;
+	private UserEntity user;
 	
 	@OneToOne(optional = true)
 	@JoinColumn(nullable = true)
@@ -94,11 +94,11 @@ public class Booking implements Serializable {
 		this.id = id;
 	}
 
-	public User getUser() {
+	public UserEntity getUser() {
 		return user;
 	}
 
-	public void setUser(User user) {
+	public void setUser(UserEntity user) {
 		this.user = user;
 	}
 
@@ -251,7 +251,7 @@ public class Booking implements Serializable {
 				+ ", reason=" + reason + ", invoice=" + invoice + "]";
 	}
 
-	public Booking(long id, User user, Tutor handler, String subject, String topic, String classNumber, String board,
+	public Booking(long id, UserEntity user, Tutor handler, String subject, String topic, String classNumber, String board,
 			String line1, String line2, String city, String pincode, Date schedule, Date deadline, boolean rescheduled,
 			String secret, int score, String comment, String reason, Invoice invoice) {
 		super();

@@ -1,18 +1,14 @@
 package com.pce.BookMeTutor.Model.Dto.Requests;
 
-import java.util.Set;
-
-import javax.validation.constraints.Email;
-
-public class UserRequest {
+public class StudentRegistrationRequest {
 	
-	@Email
 	private String email;
 	private String password;
 	private String first_name;
 	private String last_name;
 	private String gender;
-	private Set<String> phone;
+	private String phone;
+	
 	public String getEmail() {
 		return email;
 	}
@@ -43,19 +39,14 @@ public class UserRequest {
 	public void setGender(String gender) {
 		this.gender = gender;
 	}
-	public Set<String> getPhone() {
+	public String getPhone() {
 		return phone;
 	}
-	public void setPhone(Set<String> phone) {
+	public void setPhone(String phone) {
 		this.phone = phone;
 	}
-	@Override
-	public String toString() {
-		return "UserRequest [email=" + email + ", password=" + password + ", first_name=" + first_name + ", last_name="
-				+ last_name + ", gender=" + gender + ", phone=" + phone + "]";
-	}
-	public UserRequest(@Email String email, String password, String first_name, String last_name, String gender,
-			Set<String> phone) {
+	public StudentRegistrationRequest(String email, String password,
+			String first_name, String last_name, String gender, String phone) {
 		super();
 		this.email = email;
 		this.password = password;
@@ -64,12 +55,9 @@ public class UserRequest {
 		this.gender = gender;
 		this.phone = phone;
 	}
-	public UserRequest() {
-		super();
+	public StudentRegistrationRequest() {
+		
 	}
-	
-	
-	
 	
 	
 }

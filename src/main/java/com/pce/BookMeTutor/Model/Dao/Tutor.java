@@ -29,11 +29,17 @@ public class Tutor implements Serializable {
 	@Column(name = "email", nullable = false, unique = true)
 	private String email;
 	
+	@Column(name = "password", nullable = false)
+	private String password;
+	
 	@Column(name = "first_name", nullable = false)
 	private String fname;
 	
 	@Column(name = "last_name")
 	private String lname;
+	
+	@Column
+	private String gender;
 	
 	@ElementCollection
 	@CollectionTable(name = "tutor_phones", joinColumns = @JoinColumn(referencedColumnName = "tutor_id"))
@@ -74,6 +80,15 @@ public class Tutor implements Serializable {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+	
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
 	}
 
 	public String getFname() {
@@ -160,20 +175,35 @@ public class Tutor implements Serializable {
 		return serialVersionUID;
 	}
 
-	@Override
-	public String toString() {
-		return "Tutor [id=" + id + ", email=" + email + ", fname=" + fname + ", lname=" + lname + ", phone=" + phone
-				+ ", qualification=" + qualification + ", verified=" + verified + ", screening=" + screening
-				+ ", line1=" + line1 + ", line2=" + line2 + ", city=" + city + ", pincode=" + pincode + "]";
+	public String getGender() {
+		return gender;
 	}
 
-	public Tutor(long id, @Email String email, String fname, String lname, Set<String> phone, String qualification,
-			boolean verified, String screening, String line1, String line2, String city, String pincode) {
+	public void setGender(String gender) {
+		this.gender = gender;
+	}
+
+	@Override
+	public String toString() {
+		return "Tutor [id=" + id + ", email=" + email + ", password=" + password
+				+ ", fname=" + fname + ", lname=" + lname + ", gender=" + gender
+				+ ", phone=" + phone + ", qualification=" + qualification
+				+ ", verified=" + verified + ", screening=" + screening
+				+ ", line1=" + line1 + ", line2=" + line2 + ", city=" + city
+				+ ", pincode=" + pincode + "]";
+	}
+
+	public Tutor(long id, @Email String email, String password, String fname,
+			String lname, String gender, Set<String> phone,
+			String qualification, boolean verified, String screening,
+			String line1, String line2, String city, String pincode) {
 		super();
 		this.id = id;
 		this.email = email;
+		this.password = password;
 		this.fname = fname;
 		this.lname = lname;
+		this.gender = gender;
 		this.phone = phone;
 		this.qualification = qualification;
 		this.verified = verified;
@@ -186,7 +216,10 @@ public class Tutor implements Serializable {
 
 	public Tutor() {
 		super();
+		// TODO Auto-generated constructor stub
 	}
+
+	
 	
 	
 	

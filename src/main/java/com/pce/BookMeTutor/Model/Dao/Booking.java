@@ -83,8 +83,21 @@ public class Booking implements Serializable {
 	@Column(name = "reason")
 	private String reason;
 	
+	@Column(name = "booking_status", nullable = false, columnDefinition = "varchar(20) default 'pending'")
+	private String status;
+	
 	@OneToOne(cascade = CascadeType.ALL)
 	private Invoice invoice;
+	
+	
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
 
 	public long getId() {
 		return id;
@@ -244,16 +257,21 @@ public class Booking implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Booking [id=" + id + ", user=" + user + ", handler=" + handler + ", subject=" + subject + ", topic="
-				+ topic + ", classNumber=" + classNumber + ", board=" + board + ", line1=" + line1 + ", line2=" + line2
-				+ ", city=" + city + ", pincode=" + pincode + ", schedule=" + schedule + ", deadline=" + deadline
-				+ ", rescheduled=" + rescheduled + ", secret=" + secret + ", score=" + score + ", comment=" + comment
-				+ ", reason=" + reason + ", invoice=" + invoice + "]";
+		return "Booking [id=" + id + ", user=" + user + ", handler=" + handler
+				+ ", subject=" + subject + ", topic=" + topic + ", classNumber="
+				+ classNumber + ", board=" + board + ", line1=" + line1
+				+ ", line2=" + line2 + ", city=" + city + ", pincode=" + pincode
+				+ ", schedule=" + schedule + ", deadline=" + deadline
+				+ ", rescheduled=" + rescheduled + ", secret=" + secret
+				+ ", score=" + score + ", comment=" + comment + ", reason="
+				+ reason + ", status=" + status + ", invoice=" + invoice + "]";
 	}
 
-	public Booking(long id, UserEntity user, Tutor handler, String subject, String topic, String classNumber, String board,
-			String line1, String line2, String city, String pincode, Date schedule, Date deadline, boolean rescheduled,
-			String secret, int score, String comment, String reason, Invoice invoice) {
+	public Booking(long id, UserEntity user, Tutor handler, String subject,
+			String topic, String classNumber, String board, String line1,
+			String line2, String city, String pincode, Date schedule,
+			Date deadline, boolean rescheduled, String secret, int score,
+			String comment, String reason, String status, Invoice invoice) {
 		super();
 		this.id = id;
 		this.user = user;
@@ -273,13 +291,14 @@ public class Booking implements Serializable {
 		this.score = score;
 		this.comment = comment;
 		this.reason = reason;
+		this.status = status;
 		this.invoice = invoice;
 	}
 
 	public Booking() {
 		super();
 	}
-	
+
 	
 	
 }

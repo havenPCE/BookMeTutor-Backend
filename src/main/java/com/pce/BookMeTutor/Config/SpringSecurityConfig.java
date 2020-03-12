@@ -34,7 +34,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 		
 		 http.csrf().disable()
 
-         .authorizeRequests().antMatchers("/test/**","/acccount/**").permitAll().
+         .authorizeRequests().antMatchers("/account/**").permitAll().
 
  anyRequest().authenticated().and().
 
@@ -56,11 +56,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 		auth.userDetailsService(myUserDetailService).passwordEncoder(getBCryptPasswordEncoder());
 	}
 	
-	@Bean
-    public JwtAuthenticationEntryPoint jwtAuthenticationEntryPointBean() throws Exception{
-        return new JwtAuthenticationEntryPoint();
-    }
-	
+
 	@Bean
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {

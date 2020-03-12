@@ -1,7 +1,6 @@
 package com.pce.BookMeTutor.Controllers;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -16,13 +15,12 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.pce.BookMeTutor.Model.Dao.Tutor;
@@ -37,13 +35,13 @@ import com.pce.BookMeTutor.Repo.UserRepo;
 import com.pce.BookMeTutor.Services.EmailService;
 import com.pce.BookMeTutor.Services.JwtTokenService;
 import com.pce.BookMeTutor.Services.MyUserDetailService;
-import com.sun.mail.iap.Response;
-import com.sun.xml.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
 
 @RestController
-@CrossOrigin
 @RequestMapping("/account")
 public class AccountController {
+	
+	@Autowired
+	BCryptPasswordEncoder encoder;
 
 	@Autowired
 	private AuthenticationManager authenticationManager;
@@ -94,7 +92,7 @@ public class AccountController {
     }
 	
 	@GetMapping("/verify")
-	public ResponseEntity<?> verifyMail(@PathVariable() String mail, @PathVariable() String jwt, @PathVariable() String role) {
+	public ResponseEntity<?> verifyMail(@RequestParam() String mail, @RequestParam() String jwt, @RequestParam() String role) {
 		
 		String userName = jwtTokenService.getUsernameFromToken(jwt);
 		
@@ -133,7 +131,7 @@ public class AccountController {
 			userEntity = userRepo.save(createStudent(studentRegistrationRequest));
 			String mail = userEntity.getEmail();
 			String token = jwtTokenService.generateToken(myUserDetailService.loadUserByUsername(mail));
-			emailService.sendMail(userEntity.getEmail(), "Registration Confirmation", "Thank you for joining us.\n\nPlease verify your mail using the link given below.\n"+"localhost:8080/account/verify?mail="+mail+"&jwt="+token+"&role=student");
+			emailService.sendMail(userEntity.getEmail(), "Registration Confirmation", "Thank you for joining us.\n\nPlease verify your mail using the link given below.\n"+"<a href=\"localhost:8080/account/verify?mail="+mail+"&jwt="+token+"&role=student\">Click me!</a>");
 			return ResponseEntity.ok(new RegistrationResponse(mail, token, new Date(System.currentTimeMillis())));
 		}
 	}
@@ -151,7 +149,7 @@ public class AccountController {
 			tutor = tutorRepo.save(createTutor(tutorRegistrationRequest));
 			String mail = tutor.getEmail();
 			String token = jwtTokenService.generateToken(myUserDetailService.loadUserByUsername(mail));
-			emailService.sendMail(tutor.getEmail(), "Registration Confirmation", "Thank you for joining us.\n\nPlease verify your mail using the link given below.\n"+"localhost:8080/account/verify?mail="+mail+"&jwt="+token+"&role=tutor");
+			emailService.sendMail(tutor.getEmail(), "Registration Confirmation", "Thank you for joining us.\n\nPlease verify your mail using the link given below.\n"+"\nlocalhost:8080/account/verify?mail="+mail+"&jwt="+token+"&role=tutor");
 			return ResponseEntity.ok(new RegistrationResponse(mail, token, new Date(System.currentTimeMillis())));
 		}
 	}
@@ -161,7 +159,7 @@ public class AccountController {
 	private UserEntity createStudent(StudentRegistrationRequest studentRegistrationRequest) {
 		UserEntity userEntity = new UserEntity();
 		userEntity.setEmail(studentRegistrationRequest.getEmail());
-		userEntity.setPassword(studentRegistrationRequest.getPassword());
+		userEntity.setPassword(encoder.encode(studentRegistrationRequest.getPassword()));
 		userEntity.setFname(studentRegistrationRequest.getFirst_name());
 		userEntity.setLname(studentRegistrationRequest.getLast_name());
 		userEntity.setGender(studentRegistrationRequest.getGender());
@@ -174,7 +172,7 @@ public class AccountController {
 	private Tutor createTutor(TutorRegistrationRequest tutorRegistrationRequest) {
 		Tutor tutor = new Tutor();
 		tutor.setEmail(tutorRegistrationRequest.getEmail());
-		tutor.setPassword(tutorRegistrationRequest.getPassword());
+		tutor.setPassword(encoder.encode(tutorRegistrationRequest.getPassword()));
 		tutor.setFname(tutorRegistrationRequest.getFirst_name());
 		tutor.setLname(tutorRegistrationRequest.getLast_name());;
 		tutor.setGender(tutorRegistrationRequest.getGender());

@@ -1,6 +1,7 @@
 package com.pce.BookMeTutor.Model.Dao;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.Set;
 
 import javax.persistence.CollectionTable;
@@ -65,6 +66,9 @@ public class Tutor implements Serializable {
 	
 	@Column(name = "pincode")
 	private String pincode;
+	
+	@Column(name = "last_selected")
+	private Date lastSelected;
 
 	public long getId() {
 		return id;
@@ -183,6 +187,14 @@ public class Tutor implements Serializable {
 		this.gender = gender;
 	}
 
+	public Date getLastSelected() {
+		return lastSelected;
+	}
+
+	public void setLastSelected(Date lastSelected) {
+		this.lastSelected = lastSelected;
+	}
+
 	@Override
 	public String toString() {
 		return "Tutor [id=" + id + ", email=" + email + ", password=" + password
@@ -190,13 +202,15 @@ public class Tutor implements Serializable {
 				+ ", phone=" + phone + ", qualification=" + qualification
 				+ ", verified=" + verified + ", screening=" + screening
 				+ ", line1=" + line1 + ", line2=" + line2 + ", city=" + city
-				+ ", pincode=" + pincode + "]";
+				+ ", pincode=" + pincode + ", lastSelected=" + lastSelected
+				+ "]";
 	}
 
 	public Tutor(long id, @Email String email, String password, String fname,
 			String lname, String gender, Set<String> phone,
 			String qualification, boolean verified, String screening,
-			String line1, String line2, String city, String pincode) {
+			String line1, String line2, String city, String pincode,
+			Date lastSelected) {
 		super();
 		this.id = id;
 		this.email = email;
@@ -212,15 +226,13 @@ public class Tutor implements Serializable {
 		this.line2 = line2;
 		this.city = city;
 		this.pincode = pincode;
+		this.lastSelected = lastSelected;
 	}
 
 	public Tutor() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
-	
-	
 	
 	
 }

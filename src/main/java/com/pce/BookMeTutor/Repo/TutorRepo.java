@@ -10,4 +10,8 @@ public interface TutorRepo extends JpaRepository<Tutor, Long> {
 	
 	Tutor findByEmail(String email);
 	
+	Tutor findFirstOrderByLastSelectedAsc();
+	
+	Tutor findFirstByEmailNotOrderByLastSelectedAsc(String email);
+	
 }

@@ -2,7 +2,9 @@ package com.pce.BookMeTutor.Controllers;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javax.mail.MessagingException;
@@ -26,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.pce.BookMeTutor.Model.Dao.Tutor;
 import com.pce.BookMeTutor.Model.Dao.UserEntity;
 import com.pce.BookMeTutor.Model.Dto.Requests.AuthenticationRequest;
+import com.pce.BookMeTutor.Model.Dto.Requests.ForgotRequest;
 import com.pce.BookMeTutor.Model.Dto.Requests.StudentRegistrationRequest;
 import com.pce.BookMeTutor.Model.Dto.Requests.TutorRegistrationRequest;
 import com.pce.BookMeTutor.Model.Dto.Responses.AuthenticationResponse;
@@ -60,6 +63,77 @@ public class AccountController {
 	
 	@Autowired
 	private EmailService emailService;
+	
+	Map<String, String> resetRequest = new HashMap<String, String>();
+	
+	@GetMapping("/confirm-password")
+	public ResponseEntity<?> changePassword(@RequestParam() String mail, @RequestParam() String jwt, @RequestParam() String role) {
+		
+		String userName = jwtTokenService.getUsernameFromToken(jwt);
+		
+		if(!userName.equalsIgnoreCase(mail)) {
+			return new ResponseEntity<>("Invalid token or token expired!", HttpStatus.BAD_REQUEST);
+		}
+		else {
+			if(role.equalsIgnoreCase("student")) {
+				UserEntity userEntity = userRepo.findByEmail(mail);
+				userEntity.setPassword(resetRequest.get(mail));
+				userRepo.save(userEntity);
+				resetRequest.remove(mail);
+				return ResponseEntity.ok("Password reset complete!");
+			}
+			if (role.equalsIgnoreCase("tutor")) {
+				Tutor tutor = tutorRepo.findByEmail(mail);
+				tutor.setPassword(resetRequest.get(mail));
+				tutorRepo.save(tutor);
+				resetRequest.remove(mail);
+				return ResponseEntity.ok("Password reset complete!");
+			}
+			return new ResponseEntity<>("Invalid request!", HttpStatus.BAD_REQUEST);
+		}
+		
+		
+	}
+	
+	@PostMapping("/forgot-password")
+	public ResponseEntity<?> resetPassword(@RequestBody ForgotRequest forgotRequest) throws MessagingException, IOException {
+		
+		String mail = forgotRequest.getEmail();
+		String password = encoder.encode(forgotRequest.getPassword());
+		String role = forgotRequest.getRole();
+		String token;
+		
+		if(role.equalsIgnoreCase("student")) {
+			UserEntity  userEntity = userRepo.findByEmail(mail);
+			if(userEntity == null) return new ResponseEntity<>("User not found!", HttpStatus.NOT_FOUND);
+			else {
+				
+				resetRequest.put(mail, password);
+				
+				token = jwtTokenService.generateToken(myUserDetailService.loadUserByUsername(mail));
+				
+				emailService.sendMail(mail,"confirm password reset" , "Click on the link below to  reset password\n\n"+
+						"<a href=\"http://localhost:8080/account/confirm-password?mail="+mail+"&jwt="+token+"&role=student\">Click me!</a>");
+				return ResponseEntity.ok("check email to confirm!");
+			}
+		}
+		if(forgotRequest.getRole().equalsIgnoreCase("tutor")) {
+			Tutor tutor = tutorRepo.findByEmail(mail);
+			if(tutor == null) return new ResponseEntity<>("Tutor not found!", HttpStatus.NOT_FOUND);
+			else {
+				resetRequest.put(mail, password);
+				
+				token = jwtTokenService.generateToken(myUserDetailService.loadUserByUsername(mail));
+				
+				emailService.sendMail(mail,"confirm password reset" , "Click on the link below to  reset password\n\n"+
+						"<a href=\"http://localhost:8080/account/confirm-password?mail="+mail+"&jwt="+token+"&role=tutor\">Click me!</a>");
+				return ResponseEntity.ok("check email to confirm!");
+			}
+		}
+		
+		return new ResponseEntity<>("role mandatory", HttpStatus.BAD_REQUEST);
+		
+	}
 	
 	@PostMapping("/authenticate")
 	public ResponseEntity<?> authenticate(@RequestBody AuthenticationRequest authenticationRequest) throws Exception {
@@ -131,7 +205,7 @@ public class AccountController {
 			userEntity = userRepo.save(createStudent(studentRegistrationRequest));
 			String mail = userEntity.getEmail();
 			String token = jwtTokenService.generateToken(myUserDetailService.loadUserByUsername(mail));
-			emailService.sendMail(userEntity.getEmail(), "Registration Confirmation", "Thank you for joining us.\n\nPlease verify your mail using the link given below.\n"+"<a href=\"localhost:8080/account/verify?mail="+mail+"&jwt="+token+"&role=student\">Click me!</a>");
+			emailService.sendMail(userEntity.getEmail(), "Registration Confirmation", "Thank you for joining us.\n\nPlease verify your mail using the link given below.\n"+"<a href=\"http://localhost:8080/account/verify?mail="+mail+"&jwt="+token+"&role=student\">Click me!</a>");
 			return ResponseEntity.ok(new RegistrationResponse(mail, token, new Date(System.currentTimeMillis())));
 		}
 	}
@@ -149,7 +223,7 @@ public class AccountController {
 			tutor = tutorRepo.save(createTutor(tutorRegistrationRequest));
 			String mail = tutor.getEmail();
 			String token = jwtTokenService.generateToken(myUserDetailService.loadUserByUsername(mail));
-			emailService.sendMail(tutor.getEmail(), "Registration Confirmation", "Thank you for joining us.\n\nPlease verify your mail using the link given below.\n"+"\nlocalhost:8080/account/verify?mail="+mail+"&jwt="+token+"&role=tutor");
+			emailService.sendMail(tutor.getEmail(), "Registration Confirmation", "Thank you for joining us.\n\nPlease verify your mail using the link given below.\n"+"<a href=\"http://localhost:8080/account/verify?mail="+mail+"&jwt="+token+"&role=tutor\">Click me!</a>");
 			return ResponseEntity.ok(new RegistrationResponse(mail, token, new Date(System.currentTimeMillis())));
 		}
 	}
@@ -184,6 +258,7 @@ public class AccountController {
 		Set<String> phoneSet = new HashSet<String>();
 		phoneSet.add(tutorRegistrationRequest.getPhone());
 		tutor.setPhone(phoneSet);
+		tutor.setLastSelected(new Date(System.currentTimeMillis()));
 		return tutor;
 	}
 	

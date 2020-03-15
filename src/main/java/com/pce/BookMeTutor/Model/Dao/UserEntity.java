@@ -1,20 +1,20 @@
 package com.pce.BookMeTutor.Model.Dao;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.Email;
-import javax.persistence.CascadeType;
-import javax.persistence.CollectionTable;
 
 @Entity
 @Table(name="users")
@@ -44,16 +44,15 @@ public class UserEntity implements Serializable {
 	private String gender;
 	
 	@ElementCollection
-	@CollectionTable(name = "user_phones", joinColumns = @JoinColumn(referencedColumnName = "user_id"))
-	private Set<String> phones;
+	private Set<String> phones = new HashSet<String>();
 	
 	@Column(name = "verified", nullable = false, columnDefinition = "boolean default false")
 	private boolean verified;
 	
-	@OneToMany(cascade = CascadeType.ALL)
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private Set<AddressEntity> addresses;
 	
-	@OneToMany(cascade = CascadeType.ALL)
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private Set<Booking> bookings;
 
 

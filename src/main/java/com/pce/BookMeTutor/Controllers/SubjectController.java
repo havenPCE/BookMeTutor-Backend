@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,9 +33,12 @@ public class SubjectController {
 	}
 	
 	@GetMapping("/subject")
-	public ResponseEntity<?> getTopics(@RequestParam("subject") String subjectName, @RequestParam("class") int classNumber) {
+	public ResponseEntity<?> getTopics(@RequestParam("name") String subjectName, @RequestParam("class") int classNumber) {
 		
 		Subject subject = subjectRepo.findBySubjectNameAndClassNumber(subjectName, classNumber);
+		
+		if(subject == null)
+			return new ResponseEntity<>("Not Found!", HttpStatus.NOT_FOUND);
 		
 		return ResponseEntity.ok(subject);
 	}
@@ -48,9 +52,9 @@ public class SubjectController {
 		
 		Set<String> topics = new HashSet<String>();
 		
-		subjectDto.getTopic().forEach(topic-> {
-			topics.add(topic);
-		});
+		topics.addAll(subjectDto.getTopic());
+		
+		subject.setTopics(topics);
 		
 		return ResponseEntity.ok(subjectRepo.save(subject));
 		

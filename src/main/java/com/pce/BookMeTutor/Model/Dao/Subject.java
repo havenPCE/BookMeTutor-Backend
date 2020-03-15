@@ -1,19 +1,16 @@
 package com.pce.BookMeTutor.Model.Dao;
 
 import java.io.Serializable;
+import java.util.HashSet;
 import java.util.Set;
 
-import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.Table;
-
-
 import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "subjects")
@@ -33,8 +30,7 @@ public class Subject implements Serializable {
 	private int classNumber;
 	
 	@ElementCollection
-	@CollectionTable(name = "subject_topics", joinColumns = @JoinColumn(referencedColumnName = "subject_id"))
-	private Set<String> topics;
+	private Set<String> topics = new HashSet<String>();
 	
 
 	

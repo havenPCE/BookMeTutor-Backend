@@ -2,17 +2,17 @@ package com.pce.BookMeTutor.Model.Dao;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
-import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.Email;
@@ -45,8 +45,7 @@ public class Tutor implements Serializable {
 	private String gender;
 	
 	@ElementCollection
-	@CollectionTable(name = "tutor_phones", joinColumns = @JoinColumn(referencedColumnName = "tutor_id"))
-	private Set<String> phone;
+	private Set<String> phone = new HashSet<String>();
 	
 	@Column(name = "qualification", nullable = false)
 	private String qualification;
@@ -54,8 +53,8 @@ public class Tutor implements Serializable {
 	@Column(name = "verified", nullable = false, columnDefinition = "boolean default false")
 	private boolean verified;
 	
-	@Column(name = "screening", nullable = false, columnDefinition = "varchar(20) default 'pending'")
-	private String screening;
+	@Column(name = "screening", nullable = false)
+	private String screening = "pending";
 	
 	@Column(name = "line_1")
 	private String line1;
@@ -72,7 +71,7 @@ public class Tutor implements Serializable {
 	@Column(name = "last_selected")
 	private Date lastSelected;
 	
-	@OneToMany(cascade = CascadeType.ALL)
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private Set<Booking> bookings;
 	
 

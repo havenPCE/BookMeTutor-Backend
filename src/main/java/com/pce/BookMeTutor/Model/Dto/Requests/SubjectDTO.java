@@ -1,12 +1,12 @@
 package com.pce.BookMeTutor.Model.Dto.Requests;
 
-import java.util.List;
+import java.util.Set;
 
 public class SubjectDTO {
 	
 	private String subjectName;
 	private int classNumber;
-	private List<String> topic;
+	private Set<String> topic;
 	public String getSubjectName() {
 		return subjectName;
 	}
@@ -19,10 +19,10 @@ public class SubjectDTO {
 	public void setClassNumber(int classNumber) {
 		this.classNumber = classNumber;
 	}
-	public List<String> getTopic() {
+	public Set<String> getTopic() {
 		return topic;
 	}
-	public void setTopic(List<String> topic) {
+	public void setTopic(Set<String> topic) {
 		this.topic = topic;
 	}
 	@Override
@@ -30,7 +30,7 @@ public class SubjectDTO {
 		return "SubjectDTO [subjectName=" + subjectName + ", classNumber="
 				+ classNumber + ", topic=" + topic + "]";
 	}
-	public SubjectDTO(String subjectName, int classNumber, List<String> topic) {
+	public SubjectDTO(String subjectName, int classNumber, Set<String> topic) {
 		super();
 		this.subjectName = subjectName;
 		this.classNumber = classNumber;

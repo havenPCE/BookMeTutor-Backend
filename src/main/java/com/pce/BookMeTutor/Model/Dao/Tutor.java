@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -12,6 +13,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.Email;
 
@@ -69,6 +71,18 @@ public class Tutor implements Serializable {
 	
 	@Column(name = "last_selected")
 	private Date lastSelected;
+	
+	@OneToMany(cascade = CascadeType.ALL)
+	private Set<Booking> bookings;
+	
+
+	public Set<Booking> getBookings() {
+		return bookings;
+	}
+
+	public void setBookings(Set<Booking> bookings) {
+		this.bookings = bookings;
+	}
 
 	public long getId() {
 		return id;
@@ -195,6 +209,8 @@ public class Tutor implements Serializable {
 		this.lastSelected = lastSelected;
 	}
 
+	
+
 	@Override
 	public String toString() {
 		return "Tutor [id=" + id + ", email=" + email + ", password=" + password
@@ -203,14 +219,16 @@ public class Tutor implements Serializable {
 				+ ", verified=" + verified + ", screening=" + screening
 				+ ", line1=" + line1 + ", line2=" + line2 + ", city=" + city
 				+ ", pincode=" + pincode + ", lastSelected=" + lastSelected
-				+ "]";
+				+ ", bookings=" + bookings + "]";
 	}
 
+	
+	
 	public Tutor(long id, @Email String email, String password, String fname,
 			String lname, String gender, Set<String> phone,
 			String qualification, boolean verified, String screening,
 			String line1, String line2, String city, String pincode,
-			Date lastSelected) {
+			Date lastSelected, Set<Booking> bookings) {
 		super();
 		this.id = id;
 		this.email = email;
@@ -227,6 +245,7 @@ public class Tutor implements Serializable {
 		this.city = city;
 		this.pincode = pincode;
 		this.lastSelected = lastSelected;
+		this.bookings = bookings;
 	}
 
 	public Tutor() {

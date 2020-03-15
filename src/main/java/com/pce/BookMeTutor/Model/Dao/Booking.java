@@ -32,7 +32,7 @@ public class Booking implements Serializable {
 	@ManyToOne
 	private UserEntity user;
 	
-	@OneToOne(optional = true)
+	@ManyToOne(optional = true)
 	@JoinColumn(nullable = true)
 	private Tutor handler;
 	

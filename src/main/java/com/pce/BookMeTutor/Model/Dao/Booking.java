@@ -32,7 +32,7 @@ public class Booking implements Serializable {
 	@ManyToOne
 	private UserEntity user;
 	
-	@OneToOne(optional = true)
+	@ManyToOne(optional = true)
 	@JoinColumn(nullable = true)
 	private Tutor handler;
 	
@@ -83,8 +83,8 @@ public class Booking implements Serializable {
 	@Column(name = "reason")
 	private String reason;
 	
-	@Column(name = "booking_status", nullable = false, columnDefinition = "varchar(20) default 'pending'")
-	private String status;
+	@Column(name = "booking_status", nullable = false)
+	private String status = "not assigned";
 	
 	@OneToOne(cascade = CascadeType.ALL)
 	private Invoice invoice;

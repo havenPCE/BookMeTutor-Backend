@@ -18,6 +18,7 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -40,6 +41,7 @@ import com.pce.BookMeTutor.Services.JwtTokenService;
 import com.pce.BookMeTutor.Services.MyUserDetailService;
 
 @RestController
+@CrossOrigin
 @RequestMapping("/account")
 public class AccountController {
 	
@@ -113,7 +115,7 @@ public class AccountController {
 				token = jwtTokenService.generateToken(myUserDetailService.loadUserByUsername(mail));
 				
 				emailService.sendMail(mail,"confirm password reset" , "Click on the link below to  reset password\n\n"+
-						"<a href=\"http://localhost:8080/account/confirm-password?mail="+mail+"&jwt="+token+"&role=student\">Click me!</a>");
+						"<a href=\"http://localhost:5000/account/confirm-password?mail="+mail+"&jwt="+token+"&role=student\">Click me!</a>");
 				return ResponseEntity.ok("check email to confirm!");
 			}
 		}
@@ -126,7 +128,7 @@ public class AccountController {
 				token = jwtTokenService.generateToken(myUserDetailService.loadUserByUsername(mail));
 				
 				emailService.sendMail(mail,"confirm password reset" , "Click on the link below to  reset password\n\n"+
-						"<a href=\"http://localhost:8080/account/confirm-password?mail="+mail+"&jwt="+token+"&role=tutor\">Click me!</a>");
+						"<a href=\"http://localhost:5000/account/confirm-password?mail="+mail+"&jwt="+token+"&role=tutor\">Click me!</a>");
 				return ResponseEntity.ok("check email to confirm!");
 			}
 		}
@@ -205,7 +207,7 @@ public class AccountController {
 			userEntity = userRepo.save(createStudent(studentRegistrationRequest));
 			String mail = userEntity.getEmail();
 			String token = jwtTokenService.generateToken(myUserDetailService.loadUserByUsername(mail));
-			emailService.sendMail(userEntity.getEmail(), "Registration Confirmation", "Thank you for joining us.\n\nPlease verify your mail using the link given below.\n"+"<a href=\"http://localhost:8080/account/verify?mail="+mail+"&jwt="+token+"&role=student\">Click me!</a>");
+			emailService.sendMail(userEntity.getEmail(), "Registration Confirmation", "Thank you for joining us.\n\nPlease verify your mail using the link given below.\n"+"<a href=\"http://localhost:5000/account/verify?mail="+mail+"&jwt="+token+"&role=student\">Click me!</a>");
 			return ResponseEntity.ok(new RegistrationResponse(mail, token, new Date(System.currentTimeMillis())));
 		}
 	}
@@ -223,7 +225,7 @@ public class AccountController {
 			tutor = tutorRepo.save(createTutor(tutorRegistrationRequest));
 			String mail = tutor.getEmail();
 			String token = jwtTokenService.generateToken(myUserDetailService.loadUserByUsername(mail));
-			emailService.sendMail(tutor.getEmail(), "Registration Confirmation", "Thank you for joining us.\n\nPlease verify your mail using the link given below.\n"+"<a href=\"http://localhost:8080/account/verify?mail="+mail+"&jwt="+token+"&role=tutor\">Click me!</a>");
+			emailService.sendMail(tutor.getEmail(), "Registration Confirmation", "Thank you for joining us.\n\nPlease verify your mail using the link given below.\n"+"<a href=\"http://localhost:5000/account/verify?mail="+mail+"&jwt="+token+"&role=tutor\">Click me!</a>");
 			return ResponseEntity.ok(new RegistrationResponse(mail, token, new Date(System.currentTimeMillis())));
 		}
 	}

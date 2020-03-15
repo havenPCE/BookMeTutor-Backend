@@ -21,44 +21,46 @@ import com.pce.BookMeTutor.Repo.SubjectRepo;
 @RestController
 @CrossOrigin
 public class SubjectController {
-	
+
 	@Autowired
 	SubjectRepo subjectRepo;
-	
+
 	@GetMapping("/subjects")
 	public ResponseEntity<?> getAllSubjects() {
-		
+
 		List<Subject> subjects = subjectRepo.findAll();
 		return ResponseEntity.ok(subjects);
 	}
-	
+
 	@GetMapping("/subject")
-	public ResponseEntity<?> getTopics(@RequestParam("name") String subjectName, @RequestParam("class") int classNumber) {
-		
-		Subject subject = subjectRepo.findBySubjectNameAndClassNumber(subjectName, classNumber);
-		
-		if(subject == null)
+	public ResponseEntity<?> getTopics(@RequestParam("name") String subjectName,
+			@RequestParam("class") int classNumber) {
+
+		Subject subject = subjectRepo
+				.findBySubjectNameAndClassNumber(subjectName, classNumber);
+
+		if (subject == null)
 			return new ResponseEntity<>("Not Found!", HttpStatus.NOT_FOUND);
-		
+
 		return ResponseEntity.ok(subject);
 	}
-	
+
 	@PostMapping("/subject")
-	public ResponseEntity<?> createSubject(@RequestBody() SubjectDTO subjectDto) {
-		
+	public ResponseEntity<?> createSubject(
+			@RequestBody() SubjectDTO subjectDto) {
+
 		Subject subject = new Subject();
 		subject.setName(subjectDto.getSubjectName());
 		subject.setClassNumber(subjectDto.getClassNumber());
-		
+
 		Set<String> topics = new HashSet<String>();
-		
+
 		topics.addAll(subjectDto.getTopic());
-		
+
 		subject.setTopics(topics);
-		
+
 		return ResponseEntity.ok(subjectRepo.save(subject));
-		
+
 	}
-	
 
 }

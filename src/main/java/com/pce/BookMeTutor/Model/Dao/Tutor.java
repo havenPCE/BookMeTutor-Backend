@@ -24,56 +24,55 @@ public class Tutor implements Serializable {
 	private static final long serialVersionUID = -7581281985922955056L;
 
 	@Id
-	@GeneratedValue(strategy= GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "tutor_id", unique = true, nullable = false)
 	private long id;
-	
+
 	@Email
 	@Column(name = "email", nullable = false, unique = true)
 	private String email;
-	
+
 	@Column(name = "password", nullable = false)
 	private String password;
-	
+
 	@Column(name = "first_name", nullable = false)
 	private String fname;
-	
+
 	@Column(name = "last_name")
 	private String lname;
-	
+
 	@Column
 	private String gender;
-	
+
 	@ElementCollection
 	private Set<String> phone = new HashSet<String>();
-	
+
 	@Column(name = "qualification", nullable = false)
 	private String qualification;
-	
+
 	@Column(name = "verified", nullable = false, columnDefinition = "boolean default false")
 	private boolean verified;
-	
+
 	@Column(name = "screening", nullable = false)
 	private String screening = "pending";
-	
+
 	@Column(name = "line_1")
 	private String line1;
-	
+
 	@Column(name = "line_2")
 	private String line2;
-	
+
 	@Column(name = "city")
 	private String city;
-	
+
 	@Column(name = "pincode")
 	private String pincode;
-	
+
 	@Column(name = "last_selected")
 	private Date lastSelected;
-	
+
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 	private Set<Booking> bookings;
-	
 
 	public Set<Booking> getBookings() {
 		return bookings;
@@ -98,7 +97,6 @@ public class Tutor implements Serializable {
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	
 
 	public String getPassword() {
 		return password;
@@ -208,8 +206,6 @@ public class Tutor implements Serializable {
 		this.lastSelected = lastSelected;
 	}
 
-	
-
 	@Override
 	public String toString() {
 		return "Tutor [id=" + id + ", email=" + email + ", password=" + password
@@ -221,8 +217,6 @@ public class Tutor implements Serializable {
 				+ ", bookings=" + bookings + "]";
 	}
 
-	
-	
 	public Tutor(long id, @Email String email, String password, String fname,
 			String lname, String gender, Set<String> phone,
 			String qualification, boolean verified, String screening,
@@ -251,6 +245,4 @@ public class Tutor implements Serializable {
 		super();
 	}
 
-	
-	
 }

@@ -10,13 +10,12 @@ import com.pce.BookMeTutor.Model.Dao.UserEntity;
 
 public class StudentDetails implements UserDetails {
 
-	
 	private static final long serialVersionUID = -1694632384858836272L;
-	
+
 	private String userName;
 	private String password;
 	private boolean enabled;
-	
+
 	public StudentDetails(UserEntity user) {
 		this.userName = user.getEmail();
 		this.password = user.getPassword();
@@ -25,25 +24,25 @@ public class StudentDetails implements UserDetails {
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-	
+
 		return new ArrayList<GrantedAuthority>();
 	}
 
 	@Override
 	public String getPassword() {
-		
+
 		return this.password;
 	}
 
 	@Override
 	public String getUsername() {
-		
+
 		return this.userName;
 	}
 
 	@Override
 	public boolean isAccountNonExpired() {
-		
+
 		return true;
 	}
 
@@ -61,7 +60,5 @@ public class StudentDetails implements UserDetails {
 	public boolean isEnabled() {
 		return this.enabled;
 	}
-	
-	
 
 }

@@ -3,11 +3,9 @@ package com.pce.BookMeTutor.Repo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.pce.BookMeTutor.Model.Dao.UserEntity;
+import com.pce.BookMeTutor.Model.Dao.AddressEntity;
 
 @Repository
-public interface UserRepo extends JpaRepository<UserEntity, Long> {
-
-	UserEntity findByEmail(String email);
+public interface AddressRepo extends JpaRepository<AddressEntity, Long> {
 
 }

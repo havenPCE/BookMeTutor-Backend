@@ -19,32 +19,37 @@ import com.pce.BookMeTutor.Services.MyUserDetailService;
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
-	
+
 	@Autowired
 	private MyUserDetailService myUserDetailService;
-	
+
 	@Autowired
 	private JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
-	
+
 	@Autowired
 	private JwtRequestFilter jwtRequestFilter;
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		
-		 http.csrf().disable()
 
-         .authorizeRequests().antMatchers("/","/account/**","/subject","/subjects").permitAll().
+		http.csrf().disable()
 
- anyRequest().authenticated().and().
+				.authorizeRequests()
+				.antMatchers("/", "/account/**", "/subject", "/subjects")
+				.permitAll().
 
- exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
+				anyRequest().authenticated().and().
 
-         .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+				exceptionHandling()
+				.authenticationEntryPoint(jwtAuthenticationEntryPoint).and()
+				.sessionManagement()
 
- http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+				.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+
+		http.addFilterBefore(jwtRequestFilter,
+				UsernamePasswordAuthenticationFilter.class);
 	}
-	
+
 	@Bean
 	public BCryptPasswordEncoder getBCryptPasswordEncoder() {
 		return new BCryptPasswordEncoder();
@@ -53,17 +58,15 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth)
 			throws Exception {
-		auth.userDetailsService(myUserDetailService).passwordEncoder(getBCryptPasswordEncoder());
+		auth.userDetailsService(myUserDetailService)
+				.passwordEncoder(getBCryptPasswordEncoder());
 	}
-	
 
 	@Bean
-    @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
+	@Override
+	public AuthenticationManager authenticationManagerBean() throws Exception {
+		return super.authenticationManagerBean();
 
-    }
-	
-	
+	}
 
 }

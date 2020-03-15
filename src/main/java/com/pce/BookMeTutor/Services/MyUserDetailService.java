@@ -18,23 +18,23 @@ public class MyUserDetailService implements UserDetailsService {
 
 	@Autowired
 	UserRepo userRepo;
-	
+
 	@Autowired
 	TutorRepo tutorRepo;
-	
+
 	@Override
 	public UserDetails loadUserByUsername(String username)
 			throws UsernameNotFoundException {
-		
+
 		UserEntity userEntity = userRepo.findByEmail(username);
-		if(userEntity == null) {
+		if (userEntity == null) {
 			Tutor tutor = tutorRepo.findByEmail(username);
-			if(tutor == null) {
+			if (tutor == null) {
 				throw new UsernameNotFoundException("User not found!");
 			}
 			return new TutorDetails(tutor);
 		}
-		
+
 		return new StudentDetails(userEntity);
 	}
 

@@ -1,11 +1,11 @@
 package com.pce.BookMeTutor.Model.Dto.Requests;
 
 public class EmailRequest {
-	
+
 	private String to;
 	private String subject;
 	private String text;
-	
+
 	public String getTo() {
 		return to;
 	}
@@ -24,12 +24,13 @@ public class EmailRequest {
 	public void setText(String text) {
 		this.text = text;
 	}
-	
+
 	@Override
 	public String toString() {
-		return "EmailRequest [to=" + to + ", subject=" + subject + ", text=" + text + "]";
+		return "EmailRequest [to=" + to + ", subject=" + subject + ", text="
+				+ text + "]";
 	}
-	
+
 	public EmailRequest(String to, String subject, String text) {
 		this.to = to;
 		this.subject = subject;
@@ -38,9 +39,5 @@ public class EmailRequest {
 	public EmailRequest() {
 		super();
 	}
-	
-	
-	
-	
 
 }

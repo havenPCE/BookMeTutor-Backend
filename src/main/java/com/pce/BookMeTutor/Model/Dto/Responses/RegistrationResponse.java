@@ -3,11 +3,11 @@ package com.pce.BookMeTutor.Model.Dto.Responses;
 import java.util.Date;
 
 public class RegistrationResponse {
-	
+
 	private String email;
 	private String token;
 	private Date registered;
-	
+
 	public String getEmail() {
 		return email;
 	}
@@ -20,7 +20,7 @@ public class RegistrationResponse {
 	public void setRegistered(Date registered) {
 		this.registered = registered;
 	}
-	
+
 	public String getToken() {
 		return token;
 	}
@@ -36,7 +36,5 @@ public class RegistrationResponse {
 	public RegistrationResponse() {
 		super();
 	}
-	
-	
 
 }

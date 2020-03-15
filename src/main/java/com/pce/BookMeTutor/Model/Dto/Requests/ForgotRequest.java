@@ -3,13 +3,12 @@ package com.pce.BookMeTutor.Model.Dto.Requests;
 import javax.validation.constraints.Email;
 
 public class ForgotRequest {
-	
+
 	@Email
 	private String email;
 	private String password;
 	private String role;
-	
-	
+
 	public String getRole() {
 		return role;
 	}
@@ -28,9 +27,7 @@ public class ForgotRequest {
 	public void setPassword(String password) {
 		this.password = password;
 	}
-	
-	
-	
+
 	public ForgotRequest(@Email String email, String password, String role) {
 		super();
 		this.email = email;
@@ -44,7 +41,5 @@ public class ForgotRequest {
 	}
 	public ForgotRequest() {
 	}
-	
-	
 
 }

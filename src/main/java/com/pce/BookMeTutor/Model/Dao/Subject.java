@@ -22,73 +22,53 @@ public class Subject implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "subject_id", unique = true, nullable = false)
 	private long id;
-	
+
 	@Column(name = "subject_name", nullable = false)
 	private String name;
-	
+
 	@Column(name = "class_number", nullable = false)
 	private int classNumber;
-	
+
 	@ElementCollection
 	private Set<String> topics = new HashSet<String>();
-	
 
-	
 	public long getId() {
 		return id;
 	}
-
-
 
 	public void setId(long id) {
 		this.id = id;
 	}
 
-
-
 	public String getName() {
 		return name;
 	}
-
-
 
 	public void setName(String name) {
 		this.name = name;
 	}
 
-
-
 	public int getClassNumber() {
 		return classNumber;
 	}
-
-
 
 	public void setClassNumber(int classNumber) {
 		this.classNumber = classNumber;
 	}
 
-
-
 	public Set<String> getTopics() {
 		return topics;
 	}
 
-
-
 	public void setTopics(Set<String> topics) {
 		this.topics = topics;
 	}
-
-
 
 	@Override
 	public String toString() {
 		return "Subject [id=" + id + ", name=" + name + ", classNumber="
 				+ classNumber + ", topics=" + topics + "]";
 	}
-
-
 
 	public Subject(long id, String name, int classNumber, Set<String> topics) {
 		super();
@@ -98,14 +78,8 @@ public class Subject implements Serializable {
 		this.topics = topics;
 	}
 
-
-
 	public Subject() {
 		// TODO Auto-generated constructor stub
 	}
 
-	
-	
-	
-	
 }

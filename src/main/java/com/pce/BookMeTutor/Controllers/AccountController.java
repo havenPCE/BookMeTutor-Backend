@@ -26,6 +26,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.pce.BookMeTutor.Model.Dao.AddressEntity;
+import com.pce.BookMeTutor.Model.Dao.Booking;
 import com.pce.BookMeTutor.Model.Dao.Tutor;
 import com.pce.BookMeTutor.Model.Dao.UserEntity;
 import com.pce.BookMeTutor.Model.Dto.Requests.AuthenticationRequest;
@@ -44,40 +46,41 @@ import com.pce.BookMeTutor.Services.MyUserDetailService;
 @CrossOrigin
 @RequestMapping("/account")
 public class AccountController {
-	
+
 	@Autowired
 	BCryptPasswordEncoder encoder;
 
 	@Autowired
 	private AuthenticationManager authenticationManager;
-	
+
 	@Autowired
 	private JwtTokenService jwtTokenService;
-	
+
 	@Autowired
 	private MyUserDetailService myUserDetailService;
-	
+
 	@Autowired
 	private UserRepo userRepo;
-	
+
 	@Autowired
 	private TutorRepo tutorRepo;
-	
+
 	@Autowired
 	private EmailService emailService;
-	
+
 	Map<String, String> resetRequest = new HashMap<String, String>();
-	
+
 	@GetMapping("/confirm-password")
-	public ResponseEntity<?> changePassword(@RequestParam() String mail, @RequestParam() String jwt, @RequestParam() String role) {
-		
+	public ResponseEntity<?> changePassword(@RequestParam() String mail,
+			@RequestParam() String jwt, @RequestParam() String role) {
+
 		String userName = jwtTokenService.getUsernameFromToken(jwt);
-		
-		if(!userName.equalsIgnoreCase(mail)) {
-			return new ResponseEntity<>("Invalid token or token expired!", HttpStatus.BAD_REQUEST);
-		}
-		else {
-			if(role.equalsIgnoreCase("student")) {
+
+		if (!userName.equalsIgnoreCase(mail)) {
+			return new ResponseEntity<>("Invalid token or token expired!",
+					HttpStatus.BAD_REQUEST);
+		} else {
+			if (role.equalsIgnoreCase("student")) {
 				UserEntity userEntity = userRepo.findByEmail(mail);
 				userEntity.setPassword(resetRequest.get(mail));
 				userRepo.save(userEntity);
@@ -91,92 +94,114 @@ public class AccountController {
 				resetRequest.remove(mail);
 				return ResponseEntity.ok("Password reset complete!");
 			}
-			return new ResponseEntity<>("Invalid request!", HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>("Invalid request!",
+					HttpStatus.BAD_REQUEST);
 		}
-		
-		
+
 	}
-	
+
 	@PostMapping("/forgot-password")
-	public ResponseEntity<?> resetPassword(@RequestBody ForgotRequest forgotRequest) throws MessagingException, IOException {
-		
+	public ResponseEntity<?> resetPassword(
+			@RequestBody ForgotRequest forgotRequest)
+			throws MessagingException, IOException {
+
 		String mail = forgotRequest.getEmail();
 		String password = encoder.encode(forgotRequest.getPassword());
 		String role = forgotRequest.getRole();
 		String token;
-		
-		if(role.equalsIgnoreCase("student")) {
-			UserEntity  userEntity = userRepo.findByEmail(mail);
-			if(userEntity == null) return new ResponseEntity<>("User not found!", HttpStatus.NOT_FOUND);
+
+		if (role.equalsIgnoreCase("student")) {
+			UserEntity userEntity = userRepo.findByEmail(mail);
+			if (userEntity == null)
+				return new ResponseEntity<>("User not found!",
+						HttpStatus.NOT_FOUND);
 			else {
-				
+
 				resetRequest.put(mail, password);
-				
-				token = jwtTokenService.generateToken(myUserDetailService.loadUserByUsername(mail));
-				
-				emailService.sendMail(mail,"confirm password reset" , "Click on the link below to  reset password\n\n"+
-						"<a href=\"http://localhost:5000/account/confirm-password?mail="+mail+"&jwt="+token+"&role=student\">Click me!</a>");
+
+				token = jwtTokenService.generateToken(
+						myUserDetailService.loadUserByUsername(mail));
+
+				emailService.sendMail(mail, "confirm password reset",
+						"Click on the link below to  reset password\n\n"
+								+ "<a href=\"http://localhost:5000/account/confirm-password?mail="
+								+ mail + "&jwt=" + token
+								+ "&role=student\">Click me!</a>");
 				return ResponseEntity.ok("check email to confirm!");
 			}
 		}
-		if(forgotRequest.getRole().equalsIgnoreCase("tutor")) {
+		if (forgotRequest.getRole().equalsIgnoreCase("tutor")) {
 			Tutor tutor = tutorRepo.findByEmail(mail);
-			if(tutor == null) return new ResponseEntity<>("Tutor not found!", HttpStatus.NOT_FOUND);
+			if (tutor == null)
+				return new ResponseEntity<>("Tutor not found!",
+						HttpStatus.NOT_FOUND);
 			else {
 				resetRequest.put(mail, password);
-				
-				token = jwtTokenService.generateToken(myUserDetailService.loadUserByUsername(mail));
-				
-				emailService.sendMail(mail,"confirm password reset" , "Click on the link below to  reset password\n\n"+
-						"<a href=\"http://localhost:5000/account/confirm-password?mail="+mail+"&jwt="+token+"&role=tutor\">Click me!</a>");
+
+				token = jwtTokenService.generateToken(
+						myUserDetailService.loadUserByUsername(mail));
+
+				emailService.sendMail(mail, "confirm password reset",
+						"Click on the link below to  reset password\n\n"
+								+ "<a href=\"http://localhost:5000/account/confirm-password?mail="
+								+ mail + "&jwt=" + token
+								+ "&role=tutor\">Click me!</a>");
 				return ResponseEntity.ok("check email to confirm!");
 			}
 		}
-		
+
 		return new ResponseEntity<>("role mandatory", HttpStatus.BAD_REQUEST);
-		
+
 	}
-	
+
 	@PostMapping("/authenticate")
-	public ResponseEntity<?> authenticate(@RequestBody AuthenticationRequest authenticationRequest) throws Exception {
-		
-		authenticate(authenticationRequest.getEmail(), authenticationRequest.getPassword());
-		
-		final UserDetails userDetails = myUserDetailService.loadUserByUsername(authenticationRequest.getEmail());
-	
+	public ResponseEntity<?> authenticate(
+			@RequestBody AuthenticationRequest authenticationRequest)
+			throws Exception {
+
+		authenticate(authenticationRequest.getEmail(),
+				authenticationRequest.getPassword());
+
+		final UserDetails userDetails = myUserDetailService
+				.loadUserByUsername(authenticationRequest.getEmail());
+
 		final String token = jwtTokenService.generateToken(userDetails);
-		
+
 		return ResponseEntity.ok(new AuthenticationResponse(token));
 	}
-	
-	private void authenticate(String username, String password) throws Exception {
 
-        try {
+	private void authenticate(String username, String password)
+			throws Exception {
 
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+		try {
 
-        } catch (DisabledException e) {
+			authenticationManager.authenticate(
+					new UsernamePasswordAuthenticationToken(username,
+							password));
 
-            throw new Exception("USER_DISABLED", e);
+		} catch (DisabledException e) {
 
-        } catch (BadCredentialsException e) {
+			throw new Exception("USER_DISABLED", e);
 
-            throw new Exception("INVALID_CREDENTIALS", e);
+		} catch (BadCredentialsException e) {
 
-        }
+			throw new Exception("INVALID_CREDENTIALS", e);
 
-    }
-	
-	@GetMapping("/verify")
-	public ResponseEntity<?> verifyMail(@RequestParam() String mail, @RequestParam() String jwt, @RequestParam() String role) {
-		
-		String userName = jwtTokenService.getUsernameFromToken(jwt);
-		
-		if(!userName.equalsIgnoreCase(mail)) {
-			return new ResponseEntity<>("Invalid token or token expired!", HttpStatus.BAD_REQUEST);
 		}
-		else {
-			if(role.equalsIgnoreCase("student")) {
+
+	}
+
+	@GetMapping("/verify")
+	public ResponseEntity<?> verifyMail(@RequestParam() String mail,
+			@RequestParam() String jwt, @RequestParam() String role) {
+
+		String userName = jwtTokenService.getUsernameFromToken(jwt);
+
+		if (!userName.equalsIgnoreCase(mail)) {
+			return new ResponseEntity<>("Invalid token or token expired!",
+					HttpStatus.BAD_REQUEST);
+		} else {
+			if (role.equalsIgnoreCase("student")) {
 				UserEntity userEntity = userRepo.findByEmail(mail);
 				userEntity.setVerified(true);
 				userRepo.save(userEntity);
@@ -188,67 +213,93 @@ public class AccountController {
 				tutorRepo.save(tutor);
 				return ResponseEntity.ok("Tutor account verified!");
 			}
-			return new ResponseEntity<>("Invalid request!", HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>("Invalid request!",
+					HttpStatus.BAD_REQUEST);
 		}
-		
+
 	}
-	
-	
+
 	@PostMapping("/register-student")
-	public ResponseEntity<?> registerStudent(@RequestBody StudentRegistrationRequest studentRegistrationRequest) throws MessagingException, IOException {
-		
-		UserEntity userEntity = userRepo.findByEmail(studentRegistrationRequest.getEmail());
-		
-		if(userEntity != null) {
-			return new ResponseEntity<>("Email already exists!", HttpStatus.CONFLICT);
+	public ResponseEntity<?> registerStudent(
+			@RequestBody StudentRegistrationRequest studentRegistrationRequest)
+			throws MessagingException, IOException {
+
+		UserEntity userEntity = userRepo
+				.findByEmail(studentRegistrationRequest.getEmail());
+
+		if (userEntity != null) {
+			return new ResponseEntity<>("Email already exists!",
+					HttpStatus.CONFLICT);
 		}
-		
+
 		else {
-			userEntity = userRepo.save(createStudent(studentRegistrationRequest));
+			userEntity = userRepo
+					.save(createStudent(studentRegistrationRequest));
 			String mail = userEntity.getEmail();
-			String token = jwtTokenService.generateToken(myUserDetailService.loadUserByUsername(mail));
-			emailService.sendMail(userEntity.getEmail(), "Registration Confirmation", "Thank you for joining us.\n\nPlease verify your mail using the link given below.\n"+"<a href=\"http://localhost:5000/account/verify?mail="+mail+"&jwt="+token+"&role=student\">Click me!</a>");
-			return ResponseEntity.ok(new RegistrationResponse(mail, token, new Date(System.currentTimeMillis())));
+			String token = jwtTokenService.generateToken(
+					myUserDetailService.loadUserByUsername(mail));
+			emailService.sendMail(userEntity.getEmail(),
+					"Registration Confirmation",
+					"Thank you for joining us.\n\nPlease verify your mail using the link given below.\n"
+							+ "<a href=\"http://localhost:5000/account/verify?mail="
+							+ mail + "&jwt=" + token
+							+ "&role=student\">Click me!</a>");
+			return ResponseEntity.ok(new RegistrationResponse(mail, token,
+					new Date(System.currentTimeMillis())));
 		}
 	}
-	
+
 	@PostMapping("/register-tutor")
-	public ResponseEntity<?> registerTutor(@RequestBody TutorRegistrationRequest tutorRegistrationRequest) throws MessagingException, IOException {
-		
-		Tutor tutor = tutorRepo.findByEmail(tutorRegistrationRequest.getEmail());
-		
-		if(tutor != null) {
-			return new ResponseEntity<>("Email already exists!", HttpStatus.CONFLICT);
+	public ResponseEntity<?> registerTutor(
+			@RequestBody TutorRegistrationRequest tutorRegistrationRequest)
+			throws MessagingException, IOException {
+
+		Tutor tutor = tutorRepo
+				.findByEmail(tutorRegistrationRequest.getEmail());
+
+		if (tutor != null) {
+			return new ResponseEntity<>("Email already exists!",
+					HttpStatus.CONFLICT);
 		}
-		
+
 		else {
 			tutor = tutorRepo.save(createTutor(tutorRegistrationRequest));
 			String mail = tutor.getEmail();
-			String token = jwtTokenService.generateToken(myUserDetailService.loadUserByUsername(mail));
-			emailService.sendMail(tutor.getEmail(), "Registration Confirmation", "Thank you for joining us.\n\nPlease verify your mail using the link given below.\n"+"<a href=\"http://localhost:5000/account/verify?mail="+mail+"&jwt="+token+"&role=tutor\">Click me!</a>");
-			return ResponseEntity.ok(new RegistrationResponse(mail, token, new Date(System.currentTimeMillis())));
+			String token = jwtTokenService.generateToken(
+					myUserDetailService.loadUserByUsername(mail));
+			emailService.sendMail(tutor.getEmail(), "Registration Confirmation",
+					"Thank you for joining us.\n\nPlease verify your mail using the link given below.\n"
+							+ "<a href=\"http://localhost:5000/account/verify?mail="
+							+ mail + "&jwt=" + token
+							+ "&role=tutor\">Click me!</a>");
+			return ResponseEntity.ok(new RegistrationResponse(mail, token,
+					new Date(System.currentTimeMillis())));
 		}
 	}
-	
-	
-	
-	private UserEntity createStudent(StudentRegistrationRequest studentRegistrationRequest) {
+
+	private UserEntity createStudent(
+			StudentRegistrationRequest studentRegistrationRequest) {
 		UserEntity userEntity = new UserEntity();
 		userEntity.setEmail(studentRegistrationRequest.getEmail());
-		userEntity.setPassword(encoder.encode(studentRegistrationRequest.getPassword()));
+		userEntity.setPassword(
+				encoder.encode(studentRegistrationRequest.getPassword()));
 		userEntity.setFname(studentRegistrationRequest.getFirst_name());
 		userEntity.setLname(studentRegistrationRequest.getLast_name());
 		userEntity.setGender(studentRegistrationRequest.getGender());
 		Set<String> phoneSet = new HashSet<String>();
 		phoneSet.add(studentRegistrationRequest.getPhone());
 		userEntity.setPhones(phoneSet);
+		userEntity.setAddresses(new HashSet<AddressEntity>());
+		userEntity.setBookings(new HashSet<Booking>());
 		return userEntity;
 	}
-	
-	private Tutor createTutor(TutorRegistrationRequest tutorRegistrationRequest) {
+
+	private Tutor createTutor(
+			TutorRegistrationRequest tutorRegistrationRequest) {
 		Tutor tutor = new Tutor();
 		tutor.setEmail(tutorRegistrationRequest.getEmail());
-		tutor.setPassword(encoder.encode(tutorRegistrationRequest.getPassword()));
+		tutor.setPassword(
+				encoder.encode(tutorRegistrationRequest.getPassword()));
 		tutor.setFname(tutorRegistrationRequest.getFirst_name());
 		tutor.setLname(tutorRegistrationRequest.getLast_name());;
 		tutor.setGender(tutorRegistrationRequest.getGender());
@@ -260,8 +311,9 @@ public class AccountController {
 		Set<String> phoneSet = new HashSet<String>();
 		phoneSet.add(tutorRegistrationRequest.getPhone());
 		tutor.setPhone(phoneSet);
+		tutor.setBookings(new HashSet<Booking>());
 		tutor.setLastSelected(new Date(System.currentTimeMillis()));
 		return tutor;
 	}
-	
+
 }

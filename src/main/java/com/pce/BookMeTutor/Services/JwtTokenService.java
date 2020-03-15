@@ -19,71 +19,69 @@ import io.jsonwebtoken.SignatureAlgorithm;
 public class JwtTokenService implements Serializable {
 
 	private static final long serialVersionUID = 7368466600566991572L;
-	
 
 	public String getUsernameFromToken(String token) {
 
-        return getClaimFromToken(token, Claims::getSubject);
+		return getClaimFromToken(token, Claims::getSubject);
 
-    }
+	}
 
+	public Date getExpirationDateFromToken(String token) {
 
-    public Date getExpirationDateFromToken(String token) {
+		return getClaimFromToken(token, Claims::getExpiration);
 
-        return getClaimFromToken(token, Claims::getExpiration);
+	}
 
-    }
+	public <T> T getClaimFromToken(String token,
+			Function<Claims, T> claimsResolver) {
 
-    public <T> T getClaimFromToken(String token, Function<Claims, T> claimsResolver) {
+		final Claims claims = getAllClaimsFromToken(token);
 
-        final Claims claims = getAllClaimsFromToken(token);
+		return claimsResolver.apply(claims);
 
-        return claimsResolver.apply(claims);
+	}
 
-    }
+	private Claims getAllClaimsFromToken(String token) {
 
+		return Jwts.parser().setSigningKey(Constants.SECRET)
+				.parseClaimsJws(token).getBody();
 
-    private Claims getAllClaimsFromToken(String token) {
+	}
 
-        return Jwts.parser().setSigningKey(Constants.SECRET).parseClaimsJws(token).getBody();
+	private Boolean isTokenExpired(String token) {
 
-    }
+		final Date expiration = getExpirationDateFromToken(token);
 
+		return expiration.before(new Date());
 
-    private Boolean isTokenExpired(String token) {
+	}
 
-        final Date expiration = getExpirationDateFromToken(token);
+	public String generateToken(UserDetails userDetails) {
 
-        return expiration.before(new Date());
+		Map<String, Object> claims = new HashMap<>();
 
-    }
+		return doGenerateToken(claims, userDetails.getUsername());
 
+	}
 
-    public String generateToken(UserDetails userDetails) {
+	private String doGenerateToken(Map<String, Object> claims, String subject) {
 
-        Map<String, Object> claims = new HashMap<>();
+		return Jwts.builder().setClaims(claims).setSubject(subject)
+				.setIssuedAt(new Date(System.currentTimeMillis()))
 
-        return doGenerateToken(claims, userDetails.getUsername());
+				.setExpiration(new Date(
+						System.currentTimeMillis() + Constants.EXPIRATION_TIME))
 
-    }
+				.signWith(SignatureAlgorithm.HS512, Constants.SECRET).compact();
 
+	}
 
-    private String doGenerateToken(Map<String, Object> claims, String subject) {
+	public Boolean validateToken(String token, UserDetails userDetails) {
 
-        return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
+		final String username = getUsernameFromToken(token);
 
-                .setExpiration(new Date(System.currentTimeMillis() + Constants.EXPIRATION_TIME))
+		return (username.equals(userDetails.getUsername())
+				&& !isTokenExpired(token));
 
-                .signWith(SignatureAlgorithm.HS512, Constants.SECRET).compact();
-
-    }
-
-
-    public Boolean validateToken(String token, UserDetails userDetails) {
-
-        final String username = getUsernameFromToken(token);
-
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
-
-    }
+	}
 }

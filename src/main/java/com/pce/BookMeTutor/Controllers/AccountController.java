@@ -18,7 +18,6 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,8 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.pce.BookMeTutor.Model.Dao.AddressEntity;
-import com.pce.BookMeTutor.Model.Dao.Booking;
+import com.pce.BookMeTutor.Config.Constants;
 import com.pce.BookMeTutor.Model.Dao.Tutor;
 import com.pce.BookMeTutor.Model.Dao.UserEntity;
 import com.pce.BookMeTutor.Model.Dto.Requests.AuthenticationRequest;
@@ -43,7 +41,6 @@ import com.pce.BookMeTutor.Services.JwtTokenService;
 import com.pce.BookMeTutor.Services.MyUserDetailService;
 
 @RestController
-@CrossOrigin
 @RequestMapping("/account")
 public class AccountController {
 
@@ -124,8 +121,9 @@ public class AccountController {
 
 				emailService.sendMail(mail, "confirm password reset",
 						"Click on the link below to  reset password\n\n"
-								+ "<a href=\"http://localhost:5000/account/confirm-password?mail="
-								+ mail + "&jwt=" + token
+								+ "<a href=" + Constants.BACKEND_URL
+								+ "account/confirm-password?mail=" + mail
+								+ "&jwt=" + token
 								+ "&role=student\">Click me!</a>");
 				return ResponseEntity.ok("check email to confirm!");
 			}
@@ -143,8 +141,9 @@ public class AccountController {
 
 				emailService.sendMail(mail, "confirm password reset",
 						"Click on the link below to  reset password\n\n"
-								+ "<a href=\"http://localhost:5000/account/confirm-password?mail="
-								+ mail + "&jwt=" + token
+								+ "<a href=" + Constants.BACKEND_URL
+								+ "account/confirm-password?mail=" + mail
+								+ "&jwt=" + token
 								+ "&role=tutor\">Click me!</a>");
 				return ResponseEntity.ok("check email to confirm!");
 			}
@@ -241,8 +240,8 @@ public class AccountController {
 			emailService.sendMail(userEntity.getEmail(),
 					"Registration Confirmation",
 					"Thank you for joining us.\n\nPlease verify your mail using the link given below.\n"
-							+ "<a href=\"http://localhost:5000/account/verify?mail="
-							+ mail + "&jwt=" + token
+							+ "<a href=" + Constants.BACKEND_URL
+							+ "account/verify?mail=" + mail + "&jwt=" + token
 							+ "&role=student\">Click me!</a>");
 			return ResponseEntity.ok(new RegistrationResponse(mail, token,
 					new Date(System.currentTimeMillis())));
@@ -269,8 +268,8 @@ public class AccountController {
 					myUserDetailService.loadUserByUsername(mail));
 			emailService.sendMail(tutor.getEmail(), "Registration Confirmation",
 					"Thank you for joining us.\n\nPlease verify your mail using the link given below.\n"
-							+ "<a href=\"http://localhost:5000/account/verify?mail="
-							+ mail + "&jwt=" + token
+							+ "<a href=" + Constants.BACKEND_URL
+							+ "account/verify?mail=" + mail + "&jwt=" + token
 							+ "&role=tutor\">Click me!</a>");
 			return ResponseEntity.ok(new RegistrationResponse(mail, token,
 					new Date(System.currentTimeMillis())));
@@ -289,8 +288,6 @@ public class AccountController {
 		Set<String> phoneSet = new HashSet<String>();
 		phoneSet.add(studentRegistrationRequest.getPhone());
 		userEntity.setPhones(phoneSet);
-		userEntity.setAddresses(new HashSet<AddressEntity>());
-		userEntity.setBookings(new HashSet<Booking>());
 		return userEntity;
 	}
 
@@ -311,7 +308,6 @@ public class AccountController {
 		Set<String> phoneSet = new HashSet<String>();
 		phoneSet.add(tutorRegistrationRequest.getPhone());
 		tutor.setPhone(phoneSet);
-		tutor.setBookings(new HashSet<Booking>());
 		tutor.setLastSelected(new Date(System.currentTimeMillis()));
 		return tutor;
 	}

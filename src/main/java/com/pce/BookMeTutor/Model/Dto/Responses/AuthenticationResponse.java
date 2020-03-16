@@ -20,5 +20,5 @@ public class AuthenticationResponse {
 	public void setJwtToken(String jwtToken) {
 		this.jwtToken = jwtToken;
 	}
-	
+
 }

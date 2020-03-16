@@ -22,10 +22,10 @@ import io.jsonwebtoken.ExpiredJwtException;
 
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
-	
+
 	@Autowired
 	private MyUserDetailService myUserDetailService;
-	
+
 	@Autowired
 	private JwtTokenService jwtTokenService;
 
@@ -33,61 +33,61 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 	protected void doFilterInternal(HttpServletRequest request,
 			HttpServletResponse response, FilterChain filterChain)
 			throws ServletException, IOException {
-		
-		final String requestTokenHeader = request.getHeader(Constants.HEADER_FIELD_STRING);
-		
+
+		final String requestTokenHeader = request
+				.getHeader(Constants.HEADER_FIELD_STRING);
+
 		String username = null;
 
-        String jwtToken = null;
-        
+		String jwtToken = null;
 
+		if (requestTokenHeader != null
+				&& requestTokenHeader.startsWith("Bearer ")) {
 
-        if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer ")) {
+			jwtToken = requestTokenHeader.substring(7);
 
-            jwtToken = requestTokenHeader.substring(7);
+			try {
 
-            try {
+				username = jwtTokenService.getUsernameFromToken(jwtToken);
 
-                username = jwtTokenService.getUsernameFromToken(jwtToken);
+			} catch (IllegalArgumentException e) {
 
-            } catch (IllegalArgumentException e) {
+				System.out.println("Unable to get JWT Token");
 
-                System.out.println("Unable to get JWT Token");
+			} catch (ExpiredJwtException e) {
 
-            } catch (ExpiredJwtException e) {
+				System.out.println("JWT Token has expired");
 
-                System.out.println("JWT Token has expired");
+			}
 
-            }
+		} else {
 
-        } else {
+			logger.warn("JWT Token does not begin with Bearer String");
 
-            logger.warn("JWT Token does not begin with Bearer String");
+		}
 
-        }
-        
+		if (username != null && SecurityContextHolder.getContext()
+				.getAuthentication() == null) {
 
+			UserDetails userDetails = this.myUserDetailService
+					.loadUserByUsername(username);
 
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+			if (jwtTokenService.validateToken(jwtToken, userDetails)) {
 
-            UserDetails userDetails = this.myUserDetailService.loadUserByUsername(username);
+				UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
 
+						userDetails, null, userDetails.getAuthorities());
 
-            if (jwtTokenService.validateToken(jwtToken, userDetails)) {
+				usernamePasswordAuthenticationToken
 
-                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
+						.setDetails(new WebAuthenticationDetailsSource()
+								.buildDetails(request));
 
-                        userDetails, null, userDetails.getAuthorities());
+				SecurityContextHolder.getContext()
+						.setAuthentication(usernamePasswordAuthenticationToken);
+			}
+		}
+		filterChain.doFilter(request, response);
+	}
 
-                usernamePasswordAuthenticationToken
-
-                        .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-
-                SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-            }
-        }
-        filterChain.doFilter(request, response);
-    }
-	
 }

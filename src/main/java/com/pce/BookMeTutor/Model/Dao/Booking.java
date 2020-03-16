@@ -3,9 +3,11 @@ package com.pce.BookMeTutor.Model.Dao;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -13,83 +15,77 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.persistence.CascadeType;
-
-import javax.persistence.GenerationType;
 
 @Entity
 @Table(name = "booking")
 public class Booking implements Serializable {
-	
 
 	private static final long serialVersionUID = 8958089464653520081L;
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "booking_id", unique = true, nullable = false)
 	private long id;
-	
+
 	@ManyToOne
 	private UserEntity user;
-	
+
 	@ManyToOne(optional = true)
 	@JoinColumn(nullable = true)
 	private Tutor handler;
-	
+
 	@Column(nullable = false)
 	private String subject;
-	
+
 	@Column(nullable = false)
 	private String topic;
-	
+
 	@Column(name = "class_number", nullable = false)
 	private String classNumber;
-	
+
 	@Column(name = "board", nullable = false)
 	private String board;
-	
+
 	@Column(name = "line_1", nullable = false)
 	private String line1;
-	
+
 	@Column(name = "line_2", nullable = false)
 	private String line2;
-	
+
 	@Column(name = "city", nullable = false)
 	private String city;
-	
+
 	@Column(name = "pincode", nullable = false)
 	private String pincode;
-	
+
 	@Column(name = "scheduled_time", nullable = false)
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date schedule;
-	
+
 	@Column(name = "deadline_time", nullable = false)
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date deadline;
-	
+
 	@Column(name = "rescheduled", nullable = false, columnDefinition = "boolean default false")
 	private boolean rescheduled;
-	
+
 	@Column(name = "secret", nullable = false, length = 4)
 	private String secret;
-	
+
 	@Column(name = "score")
 	private int score;
-	
+
 	@Column(name = "user_comment")
 	private String comment;
-	
+
 	@Column(name = "reason")
 	private String reason;
-	
+
 	@Column(name = "booking_status", nullable = false)
 	private String status = "not assigned";
-	
+
 	@OneToOne(cascade = CascadeType.ALL)
 	private Invoice invoice;
-	
-	
 
 	public String getStatus() {
 		return status;
@@ -299,6 +295,4 @@ public class Booking implements Serializable {
 		super();
 	}
 
-	
-	
 }

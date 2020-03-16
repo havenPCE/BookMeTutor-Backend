@@ -7,9 +7,9 @@ import com.pce.BookMeTutor.Model.Dao.Tutor;
 
 @Repository
 public interface TutorRepo extends JpaRepository<Tutor, Long> {
-	
+
 	Tutor findByEmail(String email);
-	
+
 	Tutor findFirstByOrderByLastSelectedAsc();
-	
+
 }

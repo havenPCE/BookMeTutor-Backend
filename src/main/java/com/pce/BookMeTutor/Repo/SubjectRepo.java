@@ -9,9 +9,10 @@ import com.pce.BookMeTutor.Model.Dao.Subject;
 
 @Repository
 public interface SubjectRepo extends JpaRepository<Subject, Long> {
-	
+
 	@Query("SELECT s from Subject s WHERE s.name = :subject AND s.classNumber = :classNumber")
-	public Subject findBySubjectNameAndClassNumber(@Param("subject") String subject, @Param("classNumber") int classNumber);
-	
+	public Subject findBySubjectNameAndClassNumber(
+			@Param("subject") String subject,
+			@Param("classNumber") int classNumber);
 
 }

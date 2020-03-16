@@ -1,11 +1,11 @@
 package com.pce.BookMeTutor.Model.Dto.Requests;
 
 public class AuthenticationRequest {
-	
+
 	private String email;
 	private String password;
 	private String role;
-	
+
 	public String getEmail() {
 		return email;
 	}
@@ -34,7 +34,5 @@ public class AuthenticationRequest {
 		super();
 		// TODO Auto-generated constructor stub
 	}
-	
-	
 
 }

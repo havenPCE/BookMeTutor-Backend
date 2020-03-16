@@ -6,35 +6,33 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import javax.persistence.GenerationType;
-
 @Entity
 @Table(name = "user_address")
 public class AddressEntity implements Serializable {
-	
 
 	private static final long serialVersionUID = -8395838980363295033L;
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "address_id", unique = true, nullable = false)
 	private long id;
-	
+
 	@Column(name = "line_1")
 	private String line1;
-	
+
 	@Column(name = "line2")
 	private String line2;
-	
+
 	@Column(name = "city")
 	private String city;
-	
+
 	@Column(name = "pincode")
 	private String pincode;
-	
+
 	@ManyToOne(cascade = CascadeType.ALL)
 	private UserEntity user;
 
@@ -90,7 +88,8 @@ public class AddressEntity implements Serializable {
 		return serialVersionUID;
 	}
 
-	public AddressEntity(long id, String line1, String line2, String city, String pincode, UserEntity user) {
+	public AddressEntity(long id, String line1, String line2, String city,
+			String pincode, UserEntity user) {
 		super();
 		this.id = id;
 		this.line1 = line1;
@@ -106,10 +105,9 @@ public class AddressEntity implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Address [id=" + id + ", line1=" + line1 + ", line2=" + line2 + ", city=" + city + ", pincode=" + pincode
-				+ ", user=" + user + "]";
+		return "Address [id=" + id + ", line1=" + line1 + ", line2=" + line2
+				+ ", city=" + city + ", pincode=" + pincode + ", user=" + user
+				+ "]";
 	}
-	
-	
-	
+
 }

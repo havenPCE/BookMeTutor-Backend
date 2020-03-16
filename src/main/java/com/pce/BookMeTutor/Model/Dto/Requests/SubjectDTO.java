@@ -3,7 +3,7 @@ package com.pce.BookMeTutor.Model.Dto.Requests;
 import java.util.Set;
 
 public class SubjectDTO {
-	
+
 	private String subjectName;
 	private int classNumber;
 	private Set<String> topic;
@@ -39,7 +39,5 @@ public class SubjectDTO {
 	public SubjectDTO() {
 		// TODO Auto-generated constructor stub
 	}
-	
-	
 
 }

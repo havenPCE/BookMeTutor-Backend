@@ -1,7 +1,7 @@
 package com.pce.BookMeTutor.Model.Dto.Requests;
 
 public class TutorRegistrationRequest {
-	
+
 	private String email;
 	private String password;
 	private String first_name;
@@ -99,7 +99,5 @@ public class TutorRegistrationRequest {
 	public TutorRegistrationRequest() {
 		super();
 	}
-	
-	
 
 }

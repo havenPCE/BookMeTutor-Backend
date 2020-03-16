@@ -1,14 +1,14 @@
 package com.pce.BookMeTutor.Model.Dto.Requests;
 
 public class StudentRegistrationRequest {
-	
+
 	private String email;
 	private String password;
 	private String first_name;
 	private String last_name;
 	private String gender;
 	private String phone;
-	
+
 	public String getEmail() {
 		return email;
 	}
@@ -56,8 +56,7 @@ public class StudentRegistrationRequest {
 		this.phone = phone;
 	}
 	public StudentRegistrationRequest() {
-		
+
 	}
-	
-	
+
 }

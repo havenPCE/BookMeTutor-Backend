@@ -14,24 +14,22 @@ import javax.persistence.Table;
 @Table(name = "invoice")
 public class Invoice implements Serializable {
 
-	
 	private static final long serialVersionUID = -5310387311015466077L;
-
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "invoice_id", unique = true, nullable = false)
 	private long id;
-	
+
 	@OneToOne
 	private Booking booking;
-	
+
 	@Column(name = "amount", columnDefinition = "Decimal(10,2) default '100.00'")
 	private double amount;
-	
+
 	@Column(name = "payment_method")
 	private String method;
-	
+
 	@Column(name = "payment_source")
 	private String source;
 
@@ -81,11 +79,12 @@ public class Invoice implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Invoice [id=" + id + ", booking=" + booking + ", amount=" + amount + ", method=" + method + ", source="
-				+ source + "]";
+		return "Invoice [id=" + id + ", booking=" + booking + ", amount="
+				+ amount + ", method=" + method + ", source=" + source + "]";
 	}
 
-	public Invoice(long id, Booking booking, double amount, String method, String source) {
+	public Invoice(long id, Booking booking, double amount, String method,
+			String source) {
 		super();
 		this.id = id;
 		this.booking = booking;
@@ -97,7 +96,5 @@ public class Invoice implements Serializable {
 	public Invoice() {
 		super();
 	}
-	
-	
-	
+
 }

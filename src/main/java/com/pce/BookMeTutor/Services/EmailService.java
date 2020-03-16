@@ -12,20 +12,22 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class EmailService {
-	
+
 	@Autowired
 	private JavaMailSender javaMailSender;
-	
-	public void sendMail(String to, String subject, String text) throws MessagingException, IOException {
-		
+
+	public void sendMail(String to, String subject, String text)
+			throws MessagingException, IOException {
+
 		MimeMessage mimeMessage = javaMailSender.createMimeMessage();
-		
-		MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true);
-		
+
+		MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage,
+				true);
+
 		mimeMessageHelper.setTo(to);
 		mimeMessageHelper.setSubject(subject);
 		mimeMessageHelper.setText(text, true);
-		
+
 		javaMailSender.send(mimeMessage);
 	}
 

@@ -1,11 +1,9 @@
 package com.pce.BookMeTutor.Controllers;
 
-import com.pce.BookMeTutor.Model.Dto.Requests.UpdateBookingRequest;
-
-import java.lang.Integer;
-
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +26,10 @@ import com.pce.BookMeTutor.Model.Dao.UserEntity;
 import com.pce.BookMeTutor.Model.Dto.Requests.AddressRequest;
 import com.pce.BookMeTutor.Model.Dto.Requests.BookingCreationRequest;
 import com.pce.BookMeTutor.Model.Dto.Requests.CancellationRequest;
+import com.pce.BookMeTutor.Model.Dto.Requests.UpdateBookingRequest;
+import com.pce.BookMeTutor.Model.Dto.Responses.AddressResponse;
+import com.pce.BookMeTutor.Model.Dto.Responses.BookingResponse;
+import com.pce.BookMeTutor.Model.Dto.Responses.InvoiceResponse;
 import com.pce.BookMeTutor.Model.Dto.Responses.UserDetailsResponse;
 import com.pce.BookMeTutor.Repo.AddressRepo;
 import com.pce.BookMeTutor.Repo.BookingRepo;
@@ -54,28 +56,149 @@ public class UserController {
 
 	@GetMapping("/user")
 	public ResponseEntity<?> getAllUsers() {
-		return ResponseEntity.ok(userRepo.findAll());
+
+		List<UserEntity> usersEntities = userRepo.findAll();
+
+		List<UserDetailsResponse> userDetailsResponses = new ArrayList<UserDetailsResponse>();
+
+		usersEntities.forEach(user -> {
+			UserDetailsResponse userDetailsResponse = new UserDetailsResponse();
+			userDetailsResponse.setEmail(user.getEmail());
+			userDetailsResponse.setFirst_name(user.getFname());
+			userDetailsResponse.setLast_name(user.getLname());
+			userDetailsResponse.setGender(user.getGender());
+			List<AddressResponse> addressResponses = new ArrayList<AddressResponse>();
+			user.getAddresses().forEach(address -> {
+				AddressResponse addressResponse = new AddressResponse();
+				addressResponse.setId(address.getId());
+				addressResponse.setLine_1(address.getLine1());
+				addressResponse.setLine_2(address.getLine2());
+				addressResponse.setCity(address.getCity());
+				addressResponse.setPincode(address.getPincode());
+				addressResponses.add(addressResponse);
+			});
+			userDetailsResponse.setAddressResponses(addressResponses);
+
+			List<BookingResponse> bookingResponses = new ArrayList<BookingResponse>();
+			user.getBookings().forEach(booking -> {
+				BookingResponse bookingResponse = new BookingResponse();
+				bookingResponse.setId(booking.getId());
+				bookingResponse.setBoard(booking.getBoard());
+				bookingResponse.setClassNumber(booking.getClassNumber());
+				bookingResponse.setSubject(booking.getSubject());
+				bookingResponse.setTopic(booking.getTopic());
+				bookingResponse.setLine1(booking.getLine1());
+				bookingResponse.setLine2(booking.getLine2());
+				bookingResponse.setCity(booking.getCity());
+				bookingResponse.setPincode(booking.getPincode());
+				bookingResponse.setComment(booking.getComment());
+				bookingResponse.setDeadline(booking.getDeadline());
+				bookingResponse.setHandler(booking.getHandler().getFname() + " "
+						+ booking.getHandler().getLname());
+				bookingResponse.setReason(booking.getReason());
+				bookingResponse.setRescheduled(booking.isRescheduled());
+				bookingResponse.setSchedule(booking.getSchedule());
+				bookingResponse.setScore(booking.getScore());
+				bookingResponse.setSecret(booking.getSecret());
+				bookingResponse.setStatus(booking.getStatus());
+				bookingResponse.setStudent(booking.getUser().getFname() + " "
+						+ booking.getUser().getLname());
+				InvoiceResponse invoiceResponse = new InvoiceResponse();
+				Invoice invoice = booking.getInvoice();
+				invoiceResponse.setId(invoice.getId());
+				invoiceResponse.setAmount(invoice.getAmount());
+				invoiceResponse.setMethod(invoice.getMethod());
+				bookingResponse.setInvoiceResponse(invoiceResponse);
+				bookingResponses.add(bookingResponse);
+			});
+			userDetailsResponse.setBookingResponses(bookingResponses);
+			userDetailsResponses.add(userDetailsResponse);
+		});
+
+		return ResponseEntity.ok(userDetailsResponses);
 	}
 
 	@GetMapping("/user/{email}")
 	public ResponseEntity<?> getUser(@PathVariable("email") String email) {
-		UserEntity userEntity = userRepo.findByEmail(email);
-		if (userEntity == null)
+		UserEntity user = userRepo.findByEmail(email);
+		if (user == null)
 			return new ResponseEntity<>("User not found!",
 					HttpStatus.NOT_FOUND);
-		return ResponseEntity
-				.ok(new UserDetailsResponse(email, userEntity.getFname(),
-						userEntity.getLname(), userEntity.getGender()));
+
+		UserDetailsResponse userDetailsResponse = new UserDetailsResponse();
+		userDetailsResponse.setEmail(user.getEmail());
+		userDetailsResponse.setFirst_name(user.getFname());
+		userDetailsResponse.setLast_name(user.getLname());
+		userDetailsResponse.setGender(user.getGender());
+		List<AddressResponse> addressResponses = new ArrayList<AddressResponse>();
+		user.getAddresses().forEach(address -> {
+			AddressResponse addressResponse = new AddressResponse();
+			addressResponse.setId(address.getId());
+			addressResponse.setLine_1(address.getLine1());
+			addressResponse.setLine_2(address.getLine2());
+			addressResponse.setCity(address.getCity());
+			addressResponse.setPincode(address.getPincode());
+			addressResponses.add(addressResponse);
+		});
+		userDetailsResponse.setAddressResponses(addressResponses);
+
+		List<BookingResponse> bookingResponses = new ArrayList<BookingResponse>();
+		user.getBookings().forEach(booking -> {
+			BookingResponse bookingResponse = new BookingResponse();
+			bookingResponse.setId(booking.getId());
+			bookingResponse.setBoard(booking.getBoard());
+			bookingResponse.setClassNumber(booking.getClassNumber());
+			bookingResponse.setSubject(booking.getSubject());
+			bookingResponse.setTopic(booking.getTopic());
+			bookingResponse.setLine1(booking.getLine1());
+			bookingResponse.setLine2(booking.getLine2());
+			bookingResponse.setCity(booking.getCity());
+			bookingResponse.setPincode(booking.getPincode());
+			bookingResponse.setComment(booking.getComment());
+			bookingResponse.setDeadline(booking.getDeadline());
+			bookingResponse.setHandler(booking.getHandler().getFname() + " "
+					+ booking.getHandler().getLname());
+			bookingResponse.setReason(booking.getReason());
+			bookingResponse.setRescheduled(booking.isRescheduled());
+			bookingResponse.setSchedule(booking.getSchedule());
+			bookingResponse.setScore(booking.getScore());
+			bookingResponse.setSecret(booking.getSecret());
+			bookingResponse.setStatus(booking.getStatus());
+			bookingResponse.setStudent(booking.getUser().getFname() + " "
+					+ booking.getUser().getLname());
+			InvoiceResponse invoiceResponse = new InvoiceResponse();
+			Invoice invoice = booking.getInvoice();
+			invoiceResponse.setId(invoice.getId());
+			invoiceResponse.setAmount(invoice.getAmount());
+			invoiceResponse.setMethod(invoice.getMethod());
+			bookingResponse.setInvoiceResponse(invoiceResponse);
+			bookingResponses.add(bookingResponse);
+		});
+		userDetailsResponse.setBookingResponses(bookingResponses);
+
+		return ResponseEntity.ok(userDetailsResponse);
+
 	}
 
 	@GetMapping("user/{email}/address")
 	public ResponseEntity<?> getUserAddress(
 			@PathVariable("email") String email) {
-		UserEntity userEntity = userRepo.findByEmail(email);
-		if (userEntity == null)
+		UserEntity user = userRepo.findByEmail(email);
+		if (user == null)
 			return new ResponseEntity<>("User not found!",
 					HttpStatus.NOT_FOUND);
-		return ResponseEntity.ok(userEntity.getAddresses());
+		List<AddressResponse> addressResponses = new ArrayList<AddressResponse>();
+		user.getAddresses().forEach(address -> {
+			AddressResponse addressResponse = new AddressResponse();
+			addressResponse.setId(address.getId());
+			addressResponse.setLine_1(address.getLine1());
+			addressResponse.setLine_2(address.getLine2());
+			addressResponse.setCity(address.getCity());
+			addressResponse.setPincode(address.getPincode());
+			addressResponses.add(addressResponse);
+		});
+
+		return ResponseEntity.ok(addressResponses);
 	}
 
 	@PostMapping("user/{email}/address")
@@ -96,6 +219,9 @@ public class UserController {
 		addressEntity.setLine2(addressRequest.getLine_2());
 		addressEntity.setCity(addressRequest.getCity());
 		addressEntity.setPincode(addressRequest.getPincode());
+		addressEntity.setUser(userEntity);
+
+		addressEntity = addressRepo.save(addressEntity);
 
 		addressEntities.add(addressEntity);
 
@@ -115,10 +241,12 @@ public class UserController {
 			return new ResponseEntity<>("Address id invalid!",
 					HttpStatus.NOT_FOUND);
 
-		Set<AddressEntity> addressEntities = userRepo.findByEmail(email)
-				.getAddresses();
+		boolean removed = userRepo.findByEmail(email).getAddresses()
+				.remove(addressEntity);
 
-		if (addressEntities.remove(addressEntity))
+		addressRepo.delete(addressEntity);
+
+		if (removed)
 			return ResponseEntity.ok("Deleted 1 record");
 
 		else
@@ -149,7 +277,7 @@ public class UserController {
 		if (pincode != null)
 			addressEntity.setLine1(pincode);
 
-		return ResponseEntity.ok(addressRepo.save(addressEntity));
+		return ResponseEntity.ok("address updated!");
 
 	}
 
@@ -157,12 +285,45 @@ public class UserController {
 	public ResponseEntity<?> getUserBookings(
 			@PathVariable("email") String email) {
 
-		UserEntity userEntity = userRepo.findByEmail(email);
-		if (userEntity == null)
+		UserEntity user = userRepo.findByEmail(email);
+		if (user == null)
 			return new ResponseEntity<>("User not found!",
 					HttpStatus.NOT_FOUND);
 
-		return ResponseEntity.ok(userEntity.getBookings());
+		List<BookingResponse> bookingResponses = new ArrayList<BookingResponse>();
+		user.getBookings().forEach(booking -> {
+			BookingResponse bookingResponse = new BookingResponse();
+			bookingResponse.setId(booking.getId());
+			bookingResponse.setBoard(booking.getBoard());
+			bookingResponse.setClassNumber(booking.getClassNumber());
+			bookingResponse.setSubject(booking.getSubject());
+			bookingResponse.setTopic(booking.getTopic());
+			bookingResponse.setLine1(booking.getLine1());
+			bookingResponse.setLine2(booking.getLine2());
+			bookingResponse.setCity(booking.getCity());
+			bookingResponse.setPincode(booking.getPincode());
+			bookingResponse.setComment(booking.getComment());
+			bookingResponse.setDeadline(booking.getDeadline());
+			bookingResponse.setHandler(booking.getHandler().getFname() + " "
+					+ booking.getHandler().getLname());
+			bookingResponse.setReason(booking.getReason());
+			bookingResponse.setRescheduled(booking.isRescheduled());
+			bookingResponse.setSchedule(booking.getSchedule());
+			bookingResponse.setScore(booking.getScore());
+			bookingResponse.setSecret(booking.getSecret());
+			bookingResponse.setStatus(booking.getStatus());
+			bookingResponse.setStudent(booking.getUser().getFname() + " "
+					+ booking.getUser().getLname());
+			InvoiceResponse invoiceResponse = new InvoiceResponse();
+			Invoice invoice = booking.getInvoice();
+			invoiceResponse.setId(invoice.getId());
+			invoiceResponse.setAmount(invoice.getAmount());
+			invoiceResponse.setMethod(invoice.getMethod());
+			bookingResponse.setInvoiceResponse(invoiceResponse);
+			bookingResponses.add(bookingResponse);
+		});
+
+		return ResponseEntity.ok(bookingResponses);
 
 	}
 
@@ -177,14 +338,13 @@ public class UserController {
 		Invoice invoice = new Invoice();
 		invoice.setAmount(bookingCreationRequest.getAmount());
 		invoice.setMethod(bookingCreationRequest.getMethod());
-		invoice.setSource(bookingCreationRequest.getSource());
 		booking.setInvoice(invoice);
 		booking = bookingRepo.save(booking);
 		userEntity.getBookings().add(booking);
 		userRepo.save(userEntity);
 		handler.getBookings().add(booking);
 		tutorRepo.save(handler);
-		return ResponseEntity.ok(booking);
+		return ResponseEntity.ok("Booking id : "+ booking.getId());
 	}
 
 	private Booking setBooking(BookingCreationRequest bookingCreationRequest) {
@@ -204,40 +364,88 @@ public class UserController {
 		booking.setSecret(RandomString.make(4).toUpperCase());
 		return booking;
 	}
-	
+
 	@DeleteMapping("user/{email}/booking/{id}")
 	public ResponseEntity<?> cancelBooking(@PathVariable("email") String email,
-			@PathVariable("id") long id, @RequestBody() CancellationRequest cancellationRequest) {
+			@PathVariable("id") long id,
+			@RequestBody() CancellationRequest cancellationRequest) {
 		Booking booking = bookingRepo.findById(id).get();
-		if(booking == null) 
-			return new ResponseEntity<>("booking not found!", HttpStatus.NOT_FOUND);
+		if (booking == null)
+			return new ResponseEntity<>("booking not found!",
+					HttpStatus.NOT_FOUND);
 		booking.setReason(cancellationRequest.getReason());
 		booking.setStatus("cancelled");
-		return ResponseEntity.ok(bookingRepo.save(booking));	
+		bookingRepo.save(booking);
+		return ResponseEntity.ok("Booking cancelled!");
 	}
-	
+
 	@PutMapping("user/{email}/booking/{id}")
 	public ResponseEntity<?> updateBooking(@PathVariable("email") String email,
-			@PathVariable("id") long id, @RequestBody() UpdateBookingRequest updateBookingRequest) {
-		
+			@PathVariable("id") long id,
+			@RequestBody() UpdateBookingRequest updateBookingRequest) {
+
 		Booking booking = bookingRepo.findById(id).get();
-		if(booking == null)
-			return new ResponseEntity<>("booking not found!", HttpStatus.NOT_FOUND);
-		
+		if (booking == null)
+			return new ResponseEntity<>("booking not found!",
+					HttpStatus.NOT_FOUND);
+
 		String comment = updateBookingRequest.getComment();
 		Integer score = updateBookingRequest.getScore();
 		Date date = updateBookingRequest.getNew_date();
-		
-		if(comment != null)
+
+		if (comment != null)
 			booking.setComment(comment);
-		if(score != null)
+		if (score != null)
 			booking.setScore(score);
-		if(date != null) {
+		if (date != null) {
 			booking.setSchedule(date);
 			booking.setDeadline(new Date(date.getTime() - 1000 * 60 * 60 * 3));
 		}
-		return ResponseEntity.ok(bookingRepo.save(booking));	
-		
+		bookingRepo.save(booking);
+		return ResponseEntity.ok("booking updated!");
+
+	}
+
+	@GetMapping("user/{email}/booking/{id}")
+	public ResponseEntity<?> getBooking(@PathVariable("email") String email,
+			@PathVariable("id") long id) {
+		Booking booking = bookingRepo.findById(id).get();
+
+		if (booking == null) {
+			return new ResponseEntity<>("Booking not found!",
+					HttpStatus.NOT_FOUND);
+		}
+		BookingResponse bookingResponse = new BookingResponse();
+		bookingResponse.setId(booking.getId());
+		bookingResponse.setBoard(booking.getBoard());
+		bookingResponse.setClassNumber(booking.getClassNumber());
+		bookingResponse.setSubject(booking.getSubject());
+		bookingResponse.setTopic(booking.getTopic());
+		bookingResponse.setLine1(booking.getLine1());
+		bookingResponse.setLine2(booking.getLine2());
+		bookingResponse.setCity(booking.getCity());
+		bookingResponse.setPincode(booking.getPincode());
+		bookingResponse.setComment(booking.getComment());
+		bookingResponse.setDeadline(booking.getDeadline());
+		bookingResponse.setHandler(booking.getHandler().getFname() + " "
+				+ booking.getHandler().getLname());
+		bookingResponse.setReason(booking.getReason());
+		bookingResponse.setRescheduled(booking.isRescheduled());
+		bookingResponse.setSchedule(booking.getSchedule());
+		bookingResponse.setScore(booking.getScore());
+		bookingResponse.setSecret(booking.getSecret());
+		bookingResponse.setStatus(booking.getStatus());
+		bookingResponse.setStudent(booking.getUser().getFname() + " "
+				+ booking.getUser().getLname());
+		InvoiceResponse invoiceResponse = new InvoiceResponse();
+		Invoice invoice = booking.getInvoice();
+		invoiceResponse.setId(invoice.getId());
+		invoiceResponse.setAmount(invoice.getAmount());
+		invoiceResponse.setMethod(invoice.getMethod());
+		bookingResponse.setInvoiceResponse(invoiceResponse);
+
+		return ResponseEntity.ok(bookingResponse);
+
 	}
 
 }

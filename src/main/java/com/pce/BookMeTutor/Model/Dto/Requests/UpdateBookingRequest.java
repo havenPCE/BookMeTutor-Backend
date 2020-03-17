@@ -3,7 +3,7 @@ package com.pce.BookMeTutor.Model.Dto.Requests;
 import java.util.Date;
 
 public class UpdateBookingRequest {
-	
+
 	private String comment;
 	private Integer score;
 	private Date new_date;
@@ -34,6 +34,5 @@ public class UpdateBookingRequest {
 	public UpdateBookingRequest() {
 		// TODO Auto-generated constructor stub
 	}
-	
-	
+
 }

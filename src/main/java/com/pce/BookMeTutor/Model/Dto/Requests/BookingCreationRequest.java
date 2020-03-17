@@ -21,14 +21,10 @@ public class BookingCreationRequest {
 	private String pincode;
 
 	private Date schedule;
-	
+
 	private double amount;
-	
+
 	private String method;
-	
-	private String source;
-	
-	
 
 	public double getAmount() {
 		return amount;
@@ -44,14 +40,6 @@ public class BookingCreationRequest {
 
 	public void setMethod(String method) {
 		this.method = method;
-	}
-
-	public String getSource() {
-		return source;
-	}
-
-	public void setSource(String source) {
-		this.source = source;
 	}
 
 	public String getSubject() {
@@ -125,11 +113,11 @@ public class BookingCreationRequest {
 	public void setSchedule(Date schedule) {
 		this.schedule = schedule;
 	}
-	
+
 	public BookingCreationRequest(String subject, String topic,
 			String classNumber, String board, String line1, String line2,
 			String city, String pincode, Date schedule, double amount,
-			String method, String source) {
+			String method) {
 		super();
 		this.subject = subject;
 		this.topic = topic;
@@ -142,7 +130,6 @@ public class BookingCreationRequest {
 		this.schedule = schedule;
 		this.amount = amount;
 		this.method = method;
-		this.source = source;
 	}
 
 	public BookingCreationRequest() {

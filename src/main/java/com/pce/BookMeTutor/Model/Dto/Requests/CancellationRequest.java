@@ -1,7 +1,7 @@
 package com.pce.BookMeTutor.Model.Dto.Requests;
 
 public class CancellationRequest {
-	
+
 	private String reason;
 
 	public String getReason() {
@@ -20,7 +20,5 @@ public class CancellationRequest {
 	public CancellationRequest() {
 		// TODO Auto-generated constructor stub
 	}
-	
-	
 
 }

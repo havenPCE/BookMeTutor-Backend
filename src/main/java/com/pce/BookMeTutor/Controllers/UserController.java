@@ -1,5 +1,9 @@
 package com.pce.BookMeTutor.Controllers;
 
+import com.pce.BookMeTutor.Model.Dto.Requests.UpdateBookingRequest;
+
+import java.lang.Integer;
+
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -23,6 +27,7 @@ import com.pce.BookMeTutor.Model.Dao.Tutor;
 import com.pce.BookMeTutor.Model.Dao.UserEntity;
 import com.pce.BookMeTutor.Model.Dto.Requests.AddressRequest;
 import com.pce.BookMeTutor.Model.Dto.Requests.BookingCreationRequest;
+import com.pce.BookMeTutor.Model.Dto.Requests.CancellationRequest;
 import com.pce.BookMeTutor.Model.Dto.Responses.UserDetailsResponse;
 import com.pce.BookMeTutor.Repo.AddressRepo;
 import com.pce.BookMeTutor.Repo.BookingRepo;
@@ -198,6 +203,41 @@ public class UserController {
 						- 1000 * 60 * 60 * 3));
 		booking.setSecret(RandomString.make(4).toUpperCase());
 		return booking;
+	}
+	
+	@DeleteMapping("user/{email}/booking/{id}")
+	public ResponseEntity<?> cancelBooking(@PathVariable("email") String email,
+			@PathVariable("id") long id, @RequestBody() CancellationRequest cancellationRequest) {
+		Booking booking = bookingRepo.findById(id).get();
+		if(booking == null) 
+			return new ResponseEntity<>("booking not found!", HttpStatus.NOT_FOUND);
+		booking.setReason(cancellationRequest.getReason());
+		booking.setStatus("cancelled");
+		return ResponseEntity.ok(bookingRepo.save(booking));	
+	}
+	
+	@PutMapping("user/{email}/booking/{id}")
+	public ResponseEntity<?> updateBooking(@PathVariable("email") String email,
+			@PathVariable("id") long id, @RequestBody() UpdateBookingRequest updateBookingRequest) {
+		
+		Booking booking = bookingRepo.findById(id).get();
+		if(booking == null)
+			return new ResponseEntity<>("booking not found!", HttpStatus.NOT_FOUND);
+		
+		String comment = updateBookingRequest.getComment();
+		Integer score = updateBookingRequest.getScore();
+		Date date = updateBookingRequest.getNew_date();
+		
+		if(comment != null)
+			booking.setComment(comment);
+		if(score != null)
+			booking.setScore(score);
+		if(date != null) {
+			booking.setSchedule(date);
+			booking.setDeadline(new Date(date.getTime() - 1000 * 60 * 60 * 3));
+		}
+		return ResponseEntity.ok(bookingRepo.save(booking));	
+		
 	}
 
 }

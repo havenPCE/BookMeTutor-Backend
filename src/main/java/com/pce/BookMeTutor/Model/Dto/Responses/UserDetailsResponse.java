@@ -7,6 +7,7 @@ public class UserDetailsResponse {
 	private String first_name;
 	private String last_name;
 	private String gender;
+	private List<String> phones;
 	private List<AddressResponse> addressResponses;
 	private List<BookingResponse> bookingResponses;
 
@@ -63,7 +64,7 @@ public class UserDetailsResponse {
 	}
 
 	public UserDetailsResponse(String email, String first_name,
-			String last_name, String gender,
+			String last_name, String gender, List<String> phones,
 			List<AddressResponse> addressResponses,
 			List<BookingResponse> bookingResponses) {
 		super();
@@ -71,8 +72,17 @@ public class UserDetailsResponse {
 		this.first_name = first_name;
 		this.last_name = last_name;
 		this.gender = gender;
+		this.phones = phones;
 		this.addressResponses = addressResponses;
 		this.bookingResponses = bookingResponses;
+	}
+
+	public List<String> getPhones() {
+		return phones;
+	}
+
+	public void setPhones(List<String> phones) {
+		this.phones = phones;
 	}
 
 }

@@ -26,6 +26,7 @@ import com.pce.BookMeTutor.Model.Dao.UserEntity;
 import com.pce.BookMeTutor.Model.Dto.Requests.AddressRequest;
 import com.pce.BookMeTutor.Model.Dto.Requests.BookingCreationRequest;
 import com.pce.BookMeTutor.Model.Dto.Requests.CancellationRequest;
+import com.pce.BookMeTutor.Model.Dto.Requests.PhoneRequest;
 import com.pce.BookMeTutor.Model.Dto.Requests.UpdateBookingRequest;
 import com.pce.BookMeTutor.Model.Dto.Responses.AddressResponse;
 import com.pce.BookMeTutor.Model.Dto.Responses.BookingResponse;
@@ -79,6 +80,12 @@ public class UserController {
 			});
 			userDetailsResponse.setAddressResponses(addressResponses);
 
+			List<String> phonesList = new ArrayList<String>();
+
+			user.getPhones().forEach(phone -> phonesList.add(phone));
+
+			userDetailsResponse.setPhones(phonesList);
+
 			List<BookingResponse> bookingResponses = new ArrayList<BookingResponse>();
 			user.getBookings().forEach(booking -> {
 				BookingResponse bookingResponse = new BookingResponse();
@@ -118,6 +125,17 @@ public class UserController {
 		return ResponseEntity.ok(userDetailsResponses);
 	}
 
+	@DeleteMapping("/user/{email}")
+	public ResponseEntity<?> deleteUser(@PathVariable("email") String email) {
+		UserEntity userEntity = userRepo.findByEmail(email);
+		if (userEntity == null)
+			return new ResponseEntity<>("User not found!",
+					HttpStatus.NOT_FOUND);
+		userEntity.setVerified(false);
+		userRepo.save(userEntity);
+		return ResponseEntity.ok("User Deleted!");
+	}
+
 	@GetMapping("/user/{email}")
 	public ResponseEntity<?> getUser(@PathVariable("email") String email) {
 		UserEntity user = userRepo.findByEmail(email);
@@ -141,6 +159,12 @@ public class UserController {
 			addressResponses.add(addressResponse);
 		});
 		userDetailsResponse.setAddressResponses(addressResponses);
+
+		List<String> phonesList = new ArrayList<String>();
+
+		user.getPhones().forEach(phone -> phonesList.add(phone));
+
+		userDetailsResponse.setPhones(phonesList);
 
 		List<BookingResponse> bookingResponses = new ArrayList<BookingResponse>();
 		user.getBookings().forEach(booking -> {
@@ -344,7 +368,7 @@ public class UserController {
 		userRepo.save(userEntity);
 		handler.getBookings().add(booking);
 		tutorRepo.save(handler);
-		return ResponseEntity.ok("Booking id : "+ booking.getId());
+		return ResponseEntity.ok("Booking id : " + booking.getId());
 	}
 
 	private Booking setBooking(BookingCreationRequest bookingCreationRequest) {
@@ -446,6 +470,20 @@ public class UserController {
 
 		return ResponseEntity.ok(bookingResponse);
 
+	}
+
+	@PostMapping("user/{email}/phone")
+	public ResponseEntity<?> addPhone(@PathVariable("email") String email,
+			@RequestBody() PhoneRequest phoneRequest) {
+		UserEntity userEntity = userRepo.findByEmail(email);
+		if (userEntity == null)
+			return new ResponseEntity<>("User not found!",
+					HttpStatus.NOT_FOUND);
+		Set<String> phonesList = userEntity.getPhones();
+		phonesList.add(phoneRequest.getPhone());
+		userEntity.setPhones(phonesList);
+		userRepo.save(userEntity);
+		return ResponseEntity.ok("New Phone Number added!");
 	}
 
 }

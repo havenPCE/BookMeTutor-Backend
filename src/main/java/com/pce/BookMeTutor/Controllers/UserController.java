@@ -1,10 +1,13 @@
 package com.pce.BookMeTutor.Controllers;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import javax.mail.MessagingException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -36,6 +39,7 @@ import com.pce.BookMeTutor.Repo.AddressRepo;
 import com.pce.BookMeTutor.Repo.BookingRepo;
 import com.pce.BookMeTutor.Repo.TutorRepo;
 import com.pce.BookMeTutor.Repo.UserRepo;
+import com.pce.BookMeTutor.Services.EmailService;
 
 import net.bytebuddy.utility.RandomString;
 
@@ -54,6 +58,9 @@ public class UserController {
 
 	@Autowired
 	BookingRepo bookingRepo;
+	
+	@Autowired
+	EmailService emailService;
 
 	@GetMapping("/user")
 	public ResponseEntity<?> getAllUsers() {
@@ -353,10 +360,11 @@ public class UserController {
 
 	@PostMapping("user/{email}/booking")
 	public ResponseEntity<?> createBooking(@PathVariable("email") String email,
-			@RequestBody() BookingCreationRequest bookingCreationRequest) {
+			@RequestBody() BookingCreationRequest bookingCreationRequest) throws MessagingException, IOException {
 		Booking booking = setBooking(bookingCreationRequest);
 		Tutor handler = tutorRepo.findFirstByOrderByLastSelectedAsc();
 		booking.setHandler(handler);
+		handler.setLastSelected(new Date(System.currentTimeMillis()));
 		UserEntity userEntity = userRepo.findByEmail(email);
 		booking.setUser(userEntity);
 		Invoice invoice = new Invoice();
@@ -368,7 +376,19 @@ public class UserController {
 		userRepo.save(userEntity);
 		handler.getBookings().add(booking);
 		tutorRepo.save(handler);
+		sendEmail(userEntity, handler);
 		return ResponseEntity.ok("Booking id : " + booking.getId());
+	}
+	
+	private void sendEmail(UserEntity userEntity, Tutor tutor) throws MessagingException, IOException {
+		String tutorEmail = tutor.getEmail();
+		String subject = "Notice for new Booking";
+		String userName = userEntity.getFname();
+		String userEmail = userEntity.getEmail();
+		emailService.sendMail(tutorEmail, subject, "<h4>A new Booking has been to you,"
+				+ tutor.getFname() + ".\nPlease review it urgently on yout dashboard.</h4>");
+		emailService.sendMail(userEmail, subject, "<h4>Thank you for choosing us, "
+				+ userName +".\nPlease check your bookings page for further info and SECRET to handle session.</h4>");
 	}
 
 	private Booking setBooking(BookingCreationRequest bookingCreationRequest) {

@@ -89,7 +89,7 @@ public class AccountController {
 				tutor.setPassword(resetRequest.get(mail));
 				tutorRepo.save(tutor);
 				resetRequest.remove(mail);
-				return ResponseEntity.ok("Password reset complete!");
+				return ResponseEntity.ok("<h2>Password reset complete!</h2>");
 			}
 			return new ResponseEntity<>("Invalid request!",
 					HttpStatus.BAD_REQUEST);
@@ -120,11 +120,11 @@ public class AccountController {
 						myUserDetailService.loadUserByUsername(mail));
 
 				emailService.sendMail(mail, "confirm password reset",
-						"Click on the link below to  reset password\n\n"
+						"<h4>Click on the link below to  reset password\n\n"
 								+ "<a href=\"" + Constants.BACKEND_URL
 								+ "account/confirm-password?mail=" + mail
 								+ "&jwt=" + token + "&role=student"
-								+ "\">Click me!</a>");
+								+ "\">Click me!</a></h4>");
 				return ResponseEntity.ok("check email to confirm!");
 			}
 		}
@@ -140,11 +140,11 @@ public class AccountController {
 						myUserDetailService.loadUserByUsername(mail));
 
 				emailService.sendMail(mail, "confirm password reset",
-						"Click on the link below to  reset password\n\n"
+						"<h4>Click on the link below to  reset password\n\n"
 								+ "<a href=" + Constants.BACKEND_URL
 								+ "account/confirm-password?mail=" + mail
 								+ "&jwt=" + token + "&role=tutor"
-								+ "\">Click me!</a>");
+								+ "\">Click me!</a></h4>");
 				return ResponseEntity.ok("check email to confirm!");
 			}
 		}
@@ -204,13 +204,13 @@ public class AccountController {
 				UserEntity userEntity = userRepo.findByEmail(mail);
 				userEntity.setVerified(true);
 				userRepo.save(userEntity);
-				return ResponseEntity.ok("Student account verified!");
+				return ResponseEntity.ok("<h2>Student account verified!</h2>");
 			}
 			if (role.equalsIgnoreCase("tutor")) {
 				Tutor tutor = tutorRepo.findByEmail(mail);
 				tutor.setVerified(true);
 				tutorRepo.save(tutor);
-				return ResponseEntity.ok("Tutor account verified!");
+				return ResponseEntity.ok("<h2>Tutor account verified!</h2>");
 			}
 			return new ResponseEntity<>("Invalid request!",
 					HttpStatus.BAD_REQUEST);
@@ -239,10 +239,10 @@ public class AccountController {
 					myUserDetailService.loadUserByUsername(mail));
 			emailService.sendMail(userEntity.getEmail(),
 					"Registration Confirmation",
-					"Thank you for joining us.\n\nPlease verify your mail using the link given below.\n"
+					"<h4>Thank you for joining us.\n\nPlease verify your mail using the link given below.\n"
 							+ "<a href=\"" + Constants.BACKEND_URL
 							+ "account/verify?mail=" + mail + "&jwt=" + token
-							+ "&role=student" + "\">Click me!</a>");
+							+ "&role=student" + "\">Click me!</a></h4>");
 			return ResponseEntity.ok(new RegistrationResponse(mail, token,
 					new Date(System.currentTimeMillis())));
 		}
@@ -267,10 +267,10 @@ public class AccountController {
 			String token = jwtTokenService.generateToken(
 					myUserDetailService.loadUserByUsername(mail));
 			emailService.sendMail(tutor.getEmail(), "Registration Confirmation",
-					"Thank you for joining us.\n\nPlease verify your mail using the link given below.\n"
+					"<h4>Thank you for joining us.\n\nPlease verify your mail using the link given below.\n"
 							+ "<a href=\"" + Constants.BACKEND_URL
 							+ "account/verify?mail=" + mail + "&jwt=" + token
-							+ "&role=tutor" + "\">Click me!</a>");
+							+ "&role=tutor" + "\">Click me!</a></h4>");
 			return ResponseEntity.ok(new RegistrationResponse(mail, token,
 					new Date(System.currentTimeMillis())));
 		}

@@ -388,7 +388,7 @@ public class UserController {
 						+ ".\nPlease review it urgently on yout dashboard.</h4>");
 		emailService.sendMail(userEmail, subject,
 				"<h4>Thank you for choosing us, " + userName
-						+ ".\nPlease check your bookings page for further info and SECRET to handle session.</h4>");
+						+ ".\nPlease check your bookings page for further info and SECRET to handle session.\nCancellation can be done 3 hours before scheduled time for refund</h4>");
 	}
 
 	private Booking setBooking(BookingCreationRequest bookingCreationRequest) {

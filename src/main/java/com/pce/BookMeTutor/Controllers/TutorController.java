@@ -2,6 +2,7 @@ package com.pce.BookMeTutor.Controllers;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.pce.BookMeTutor.Config.Constants;
@@ -21,6 +24,7 @@ import com.pce.BookMeTutor.Model.Dao.Booking;
 import com.pce.BookMeTutor.Model.Dao.Invoice;
 import com.pce.BookMeTutor.Model.Dao.Tutor;
 import com.pce.BookMeTutor.Model.Dao.UserEntity;
+import com.pce.BookMeTutor.Model.Dto.Requests.CompletionRequest;
 import com.pce.BookMeTutor.Model.Dto.Responses.BookingResponse;
 import com.pce.BookMeTutor.Model.Dto.Responses.InvoiceResponse;
 import com.pce.BookMeTutor.Model.Dto.Responses.MessageResponse;
@@ -260,6 +264,7 @@ public class TutorController {
 				"Booking assigned to : " + tutor.getFname() + " "
 						+ tutor.getLname() + "(" + tutor.getEmail() + ")"));
 	}
+
 	private void sendEmailReject(Tutor tutor)
 			throws MessagingException, IOException {
 		String tutorEmail = tutor.getEmail();
@@ -267,5 +272,28 @@ public class TutorController {
 		emailService.sendMail(tutorEmail, subject,
 				"<h4>A new Booking has been to you," + tutor.getFname()
 						+ ".\nPlease review it urgently on yout dashboard.</h4>");
+	}
+
+	@PostMapping("/tutor/{email}/booking/{id}/complete")
+	public ResponseEntity<?> completeBooking(
+			@PathVariable("email") String email, @PathVariable("id") long id,
+			@RequestBody() CompletionRequest completionRequest) {
+		Booking booking = bookingRepo.findById(id).get();
+		if (booking == null)
+			return new ResponseEntity<>(Constants.BOOKING_NOT_FOUND,
+					HttpStatus.NOT_FOUND);
+		Date currentTime = new Date(System.currentTimeMillis());
+
+		if (completionRequest.getSecret().equals(booking.getSecret())) {
+			if (currentTime.before(booking.getSchedule()))
+				return new ResponseEntity<>("session is not finished",
+						HttpStatus.NOT_ACCEPTABLE);
+			booking.setStatus("completed");
+			bookingRepo.save(booking);
+			return ResponseEntity.ok(new MessageResponse("task completed"));
+		}
+
+		return new ResponseEntity<>(Constants.INVALID_REQUEST,
+				HttpStatus.BAD_REQUEST);
 	}
 }

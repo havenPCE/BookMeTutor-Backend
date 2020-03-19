@@ -16,12 +16,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.pce.BookMeTutor.Config.Constants;
 import com.pce.BookMeTutor.Model.Dao.Booking;
 import com.pce.BookMeTutor.Model.Dao.Invoice;
 import com.pce.BookMeTutor.Model.Dao.Tutor;
 import com.pce.BookMeTutor.Model.Dao.UserEntity;
 import com.pce.BookMeTutor.Model.Dto.Responses.BookingResponse;
 import com.pce.BookMeTutor.Model.Dto.Responses.InvoiceResponse;
+import com.pce.BookMeTutor.Model.Dto.Responses.MessageResponse;
 import com.pce.BookMeTutor.Model.Dto.Responses.TutorDetailsResponse;
 import com.pce.BookMeTutor.Repo.BookingRepo;
 import com.pce.BookMeTutor.Repo.TutorRepo;
@@ -31,7 +33,7 @@ import com.pce.BookMeTutor.Services.EmailService;
 @RestController
 @CrossOrigin
 public class TutorController {
-	
+
 	@Autowired
 	EmailService emailService;
 
@@ -104,7 +106,7 @@ public class TutorController {
 	public ResponseEntity<?> getTutor(@PathVariable("email") String email) {
 		Tutor tutor = tutorRepo.findByEmail(email);
 		if (tutor == null)
-			return new ResponseEntity<>("Tutor not found",
+			return new ResponseEntity<>(Constants.TUTOR_NOT_FOUND,
 					HttpStatus.NOT_FOUND);
 		TutorDetailsResponse tutorDetailsResponse = new TutorDetailsResponse();
 		tutorDetailsResponse.setEmail(tutor.getEmail());
@@ -158,11 +160,11 @@ public class TutorController {
 	public ResponseEntity<?> deleteTutor(@PathVariable("email") String email) {
 		Tutor tutor = tutorRepo.findByEmail(email);
 		if (tutor == null)
-			return new ResponseEntity<>("Tutor not found!",
+			return new ResponseEntity<>(Constants.TUTOR_NOT_FOUND,
 					HttpStatus.NOT_FOUND);
 		tutor.setVerified(false);
 		tutorRepo.save(tutor);
-		return ResponseEntity.ok("Tutor Deleted!");
+		return ResponseEntity.ok(new MessageResponse("tutor deactivated"));
 	}
 
 	@GetMapping("/tutor/{email}/booking")
@@ -170,7 +172,7 @@ public class TutorController {
 			@PathVariable("email") String email) {
 		Tutor tutor = tutorRepo.findByEmail(email);
 		if (tutor == null)
-			return new ResponseEntity<>("Tutor not found!",
+			return new ResponseEntity<>(Constants.TUTOR_NOT_FOUND,
 					HttpStatus.NOT_FOUND);
 		List<BookingResponse> bookingResponses = new ArrayList<BookingResponse>();
 		tutor.getBookings().forEach(booking -> {
@@ -209,39 +211,42 @@ public class TutorController {
 
 	@GetMapping("/tutor/{email}/booking/{id}/accept")
 	public ResponseEntity<?> acceptBooking(@PathVariable("email") String email,
-			@PathVariable("id") long id) throws MessagingException, IOException {
+			@PathVariable("id") long id)
+			throws MessagingException, IOException {
 		Booking booking = bookingRepo.findById(id).get();
 		if (booking == null)
-			return new ResponseEntity<>("Booking not found!",
+			return new ResponseEntity<>(Constants.BOOKING_NOT_FOUND,
 					HttpStatus.NOT_FOUND);
-		booking.setStatus("Assigned");
+		booking.setStatus("assigned");
 		bookingRepo.save(booking);
 		sendEmailAccept(booking.getUser(), booking.getHandler());
-		return ResponseEntity.ok("booking accepted!");
+		return ResponseEntity.ok(new MessageResponse("booking added"));
 	}
-	
-	private void sendEmailAccept(UserEntity userEntity, Tutor tutor) throws MessagingException, IOException {
+
+	private void sendEmailAccept(UserEntity userEntity, Tutor tutor)
+			throws MessagingException, IOException {
 		String tutorEmail = tutor.getEmail();
 		String subject = "Notice for your Booking";
 		String userName = userEntity.getFname();
 		String userEmail = userEntity.getEmail();
-		emailService.sendMail(tutorEmail, subject, "Thank you for accepting booking,"
-				+ tutor.getFname());
-		emailService.sendMail(userEmail, subject, "<h4>Hi, "
-				+ userName +".\nA tutor has been assigned to your request. Please be ready to receive Mr/Ms." 
-				+tutor.getFname()+" "+tutor.getLname()+".</h4>");
+		emailService.sendMail(tutorEmail, subject,
+				"Thank you for accepting booking," + tutor.getFname());
+		emailService.sendMail(userEmail, subject, "<h4>Hi, " + userName
+				+ ".\nA tutor has been assigned for your request. Please be ready to receive Mr/Ms."
+				+ tutor.getFname() + " " + tutor.getLname() + ".</h4>");
 	}
 
 	@GetMapping("/tutor/{email}/booking/{id}/reject")
 	public ResponseEntity<?> rejectBooking(@PathVariable("email") String email,
-			@PathVariable("id") long id) throws MessagingException, IOException {
+			@PathVariable("id") long id)
+			throws MessagingException, IOException {
 		Booking booking = bookingRepo.findById(id).get();
 		if (booking == null)
-			return new ResponseEntity<>("Booking not found!",
+			return new ResponseEntity<>(Constants.BOOKING_NOT_FOUND,
 					HttpStatus.NOT_FOUND);
 		Tutor tutor = tutorRepo.findFirstByOrderByLastSelectedAsc();
 		if (tutor.getEmail().equals(booking.getHandler().getEmail()))
-			return new ResponseEntity<>("Tutor not available",
+			return new ResponseEntity<>(Constants.TUTOR_NOT_FOUND,
 					HttpStatus.EXPECTATION_FAILED);
 		booking.getHandler().getBookings().remove(booking);
 		booking.setHandler(tutor);
@@ -251,13 +256,16 @@ public class TutorController {
 		tutor.setBookings(bookings);
 		tutorRepo.save(tutor);
 		sendEmailReject(tutor);
-		return ResponseEntity.ok("Booking assigned to : " + tutor.getFname()
-				+ " " + tutor.getLname() + "(" + tutor.getEmail() + ")");
+		return ResponseEntity.ok(new MessageResponse(
+				"Booking assigned to : " + tutor.getFname() + " "
+						+ tutor.getLname() + "(" + tutor.getEmail() + ")"));
 	}
-	private void sendEmailReject(Tutor tutor) throws MessagingException, IOException {
+	private void sendEmailReject(Tutor tutor)
+			throws MessagingException, IOException {
 		String tutorEmail = tutor.getEmail();
 		String subject = "Notice for a new Booking";
-		emailService.sendMail(tutorEmail, subject, "<h4>A new Booking has been to you,"
-				+ tutor.getFname() + ".\nPlease review it urgently on yout dashboard.</h4>");
+		emailService.sendMail(tutorEmail, subject,
+				"<h4>A new Booking has been to you," + tutor.getFname()
+						+ ".\nPlease review it urgently on yout dashboard.</h4>");
 	}
 }

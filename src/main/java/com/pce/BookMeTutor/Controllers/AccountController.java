@@ -33,6 +33,7 @@ import com.pce.BookMeTutor.Model.Dto.Requests.ForgotRequest;
 import com.pce.BookMeTutor.Model.Dto.Requests.StudentRegistrationRequest;
 import com.pce.BookMeTutor.Model.Dto.Requests.TutorRegistrationRequest;
 import com.pce.BookMeTutor.Model.Dto.Responses.AuthenticationResponse;
+import com.pce.BookMeTutor.Model.Dto.Responses.MessageResponse;
 import com.pce.BookMeTutor.Model.Dto.Responses.RegistrationResponse;
 import com.pce.BookMeTutor.Repo.TutorRepo;
 import com.pce.BookMeTutor.Repo.UserRepo;
@@ -74,7 +75,7 @@ public class AccountController {
 		String userName = jwtTokenService.getUsernameFromToken(jwt);
 
 		if (!userName.equalsIgnoreCase(mail)) {
-			return new ResponseEntity<>("Invalid token or token expired!",
+			return new ResponseEntity<>(Constants.INVALID_TOKEN,
 					HttpStatus.BAD_REQUEST);
 		} else {
 			if (role.equalsIgnoreCase("student")) {
@@ -82,7 +83,7 @@ public class AccountController {
 				userEntity.setPassword(resetRequest.get(mail));
 				userRepo.save(userEntity);
 				resetRequest.remove(mail);
-				return ResponseEntity.ok("Password reset complete!");
+				return ResponseEntity.ok("<h2>Password reset complete!</h2>");
 			}
 			if (role.equalsIgnoreCase("tutor")) {
 				Tutor tutor = tutorRepo.findByEmail(mail);
@@ -91,7 +92,7 @@ public class AccountController {
 				resetRequest.remove(mail);
 				return ResponseEntity.ok("<h2>Password reset complete!</h2>");
 			}
-			return new ResponseEntity<>("Invalid request!",
+			return new ResponseEntity<>(Constants.INVALID_REQUEST,
 					HttpStatus.BAD_REQUEST);
 		}
 
@@ -110,7 +111,7 @@ public class AccountController {
 		if (role.equalsIgnoreCase("student")) {
 			UserEntity userEntity = userRepo.findByEmail(mail);
 			if (userEntity == null)
-				return new ResponseEntity<>("User not found!",
+				return new ResponseEntity<>(Constants.USER_NOT_FOUND,
 						HttpStatus.NOT_FOUND);
 			else {
 
@@ -125,13 +126,14 @@ public class AccountController {
 								+ "account/confirm-password?mail=" + mail
 								+ "&jwt=" + token + "&role=student"
 								+ "\">Click me!</a></h4>");
-				return ResponseEntity.ok("check email to confirm!");
+				return ResponseEntity
+						.ok(new MessageResponse("check email to confirm!"));
 			}
 		}
 		if (forgotRequest.getRole().equalsIgnoreCase("tutor")) {
 			Tutor tutor = tutorRepo.findByEmail(mail);
 			if (tutor == null)
-				return new ResponseEntity<>("Tutor not found!",
+				return new ResponseEntity<>(Constants.TUTOR_NOT_FOUND,
 						HttpStatus.NOT_FOUND);
 			else {
 				resetRequest.put(mail, password);
@@ -145,11 +147,13 @@ public class AccountController {
 								+ "account/confirm-password?mail=" + mail
 								+ "&jwt=" + token + "&role=tutor"
 								+ "\">Click me!</a></h4>");
-				return ResponseEntity.ok("check email to confirm!");
+				return ResponseEntity
+						.ok(new MessageResponse("check email to confirm!"));
 			}
 		}
 
-		return new ResponseEntity<>("role mandatory", HttpStatus.BAD_REQUEST);
+		return new ResponseEntity<>(Constants.INVALID_REQUEST,
+				HttpStatus.BAD_REQUEST);
 
 	}
 
@@ -158,15 +162,23 @@ public class AccountController {
 			@RequestBody AuthenticationRequest authenticationRequest)
 			throws Exception {
 
-		authenticate(authenticationRequest.getEmail(),
-				authenticationRequest.getPassword());
+		try {
+			authenticate(authenticationRequest.getEmail(),
+					authenticationRequest.getPassword());
 
-		final UserDetails userDetails = myUserDetailService
-				.loadUserByUsername(authenticationRequest.getEmail());
+			final UserDetails userDetails = myUserDetailService
+					.loadUserByUsername(authenticationRequest.getEmail());
 
-		final String token = jwtTokenService.generateToken(userDetails);
+			final String token = jwtTokenService.generateToken(userDetails);
 
-		return ResponseEntity.ok(new AuthenticationResponse(token));
+			return ResponseEntity.ok(new AuthenticationResponse(token));
+		}
+
+		catch (Exception e) {
+			return new ResponseEntity<>(e.getMessage(),
+					HttpStatus.UNAUTHORIZED);
+		}
+
 	}
 
 	private void authenticate(String username, String password)
@@ -180,11 +192,11 @@ public class AccountController {
 
 		} catch (DisabledException e) {
 
-			throw new Exception("USER_DISABLED", e);
+			throw new Exception("user not verified or disabled", e);
 
 		} catch (BadCredentialsException e) {
 
-			throw new Exception("INVALID_CREDENTIALS", e);
+			throw new Exception("invalid email id or password", e);
 
 		}
 
@@ -197,7 +209,7 @@ public class AccountController {
 		String userName = jwtTokenService.getUsernameFromToken(jwt);
 
 		if (!userName.equalsIgnoreCase(mail)) {
-			return new ResponseEntity<>("Invalid token or token expired!",
+			return new ResponseEntity<>(Constants.INVALID_TOKEN,
 					HttpStatus.BAD_REQUEST);
 		} else {
 			if (role.equalsIgnoreCase("student")) {
@@ -212,7 +224,7 @@ public class AccountController {
 				tutorRepo.save(tutor);
 				return ResponseEntity.ok("<h2>Tutor account verified!</h2>");
 			}
-			return new ResponseEntity<>("Invalid request!",
+			return new ResponseEntity<>(Constants.INVALID_REQUEST,
 					HttpStatus.BAD_REQUEST);
 		}
 
@@ -227,7 +239,7 @@ public class AccountController {
 				.findByEmail(studentRegistrationRequest.getEmail());
 
 		if (userEntity != null) {
-			return new ResponseEntity<>("Email already exists!",
+			return new ResponseEntity<>(Constants.USER_EXISTS,
 					HttpStatus.CONFLICT);
 		}
 
@@ -257,7 +269,7 @@ public class AccountController {
 				.findByEmail(tutorRegistrationRequest.getEmail());
 
 		if (tutor != null) {
-			return new ResponseEntity<>("Email already exists!",
+			return new ResponseEntity<>(Constants.USER_EXISTS,
 					HttpStatus.CONFLICT);
 		}
 

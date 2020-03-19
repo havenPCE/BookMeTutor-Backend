@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.pce.BookMeTutor.Config.Constants;
 import com.pce.BookMeTutor.Model.Dao.Subject;
 import com.pce.BookMeTutor.Model.Dto.Requests.SubjectDTO;
 import com.pce.BookMeTutor.Repo.SubjectRepo;
@@ -38,7 +39,8 @@ public class SubjectController {
 				.findBySubjectNameAndClassNumber(subjectName, classNumber);
 
 		if (subject == null)
-			return new ResponseEntity<>("Not Found!", HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(Constants.SUBJECT_NOT_FOUND,
+					HttpStatus.NOT_FOUND);
 
 		return ResponseEntity.ok(subject);
 	}

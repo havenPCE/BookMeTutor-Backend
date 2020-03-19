@@ -82,7 +82,7 @@ public class Booking implements Serializable {
 	private String reason;
 
 	@Column(name = "booking_status", nullable = false)
-	private String status = "not assigned";
+	private String status = "unAssigned";
 
 	@OneToOne(cascade = CascadeType.ALL)
 	private Invoice invoice;

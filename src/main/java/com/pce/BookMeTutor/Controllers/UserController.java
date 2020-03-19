@@ -34,6 +34,7 @@ import com.pce.BookMeTutor.Model.Dto.Requests.UpdateBookingRequest;
 import com.pce.BookMeTutor.Model.Dto.Responses.AddressResponse;
 import com.pce.BookMeTutor.Model.Dto.Responses.BookingResponse;
 import com.pce.BookMeTutor.Model.Dto.Responses.InvoiceResponse;
+import com.pce.BookMeTutor.Model.Dto.Responses.MessageResponse;
 import com.pce.BookMeTutor.Model.Dto.Responses.UserDetailsResponse;
 import com.pce.BookMeTutor.Repo.AddressRepo;
 import com.pce.BookMeTutor.Repo.BookingRepo;
@@ -58,7 +59,7 @@ public class UserController {
 
 	@Autowired
 	BookingRepo bookingRepo;
-	
+
 	@Autowired
 	EmailService emailService;
 
@@ -136,19 +137,17 @@ public class UserController {
 	public ResponseEntity<?> deleteUser(@PathVariable("email") String email) {
 		UserEntity userEntity = userRepo.findByEmail(email);
 		if (userEntity == null)
-			return new ResponseEntity<>("User not found!",
-					HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>("user not found", HttpStatus.NOT_FOUND);
 		userEntity.setVerified(false);
 		userRepo.save(userEntity);
-		return ResponseEntity.ok("User Deleted!");
+		return ResponseEntity.ok(new MessageResponse("user deactivated"));
 	}
 
 	@GetMapping("/user/{email}")
 	public ResponseEntity<?> getUser(@PathVariable("email") String email) {
 		UserEntity user = userRepo.findByEmail(email);
 		if (user == null)
-			return new ResponseEntity<>("User not found!",
-					HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>("user not found", HttpStatus.NOT_FOUND);
 
 		UserDetailsResponse userDetailsResponse = new UserDetailsResponse();
 		userDetailsResponse.setEmail(user.getEmail());
@@ -216,8 +215,7 @@ public class UserController {
 			@PathVariable("email") String email) {
 		UserEntity user = userRepo.findByEmail(email);
 		if (user == null)
-			return new ResponseEntity<>("User not found!",
-					HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>("user not found", HttpStatus.NOT_FOUND);
 		List<AddressResponse> addressResponses = new ArrayList<AddressResponse>();
 		user.getAddresses().forEach(address -> {
 			AddressResponse addressResponse = new AddressResponse();
@@ -238,8 +236,7 @@ public class UserController {
 			@RequestBody() AddressRequest addressRequest) {
 		UserEntity userEntity = userRepo.findByEmail(email);
 		if (userEntity == null)
-			return new ResponseEntity<>("User not found!",
-					HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>("user not found", HttpStatus.NOT_FOUND);
 		Set<AddressEntity> addressEntities = userEntity.getAddresses();
 		if (addressEntities == null)
 			addressEntities = new HashSet<AddressEntity>();
@@ -260,7 +257,7 @@ public class UserController {
 
 		userRepo.save(userEntity);
 
-		return ResponseEntity.ok("New Address Saved!");
+		return ResponseEntity.ok(new MessageResponse("new address added"));
 
 	}
 
@@ -269,7 +266,7 @@ public class UserController {
 			@PathVariable("id") long id) {
 		AddressEntity addressEntity = addressRepo.findById(id).get();
 		if (addressEntity == null)
-			return new ResponseEntity<>("Address id invalid!",
+			return new ResponseEntity<>("address id invalid",
 					HttpStatus.NOT_FOUND);
 
 		boolean removed = userRepo.findByEmail(email).getAddresses()
@@ -278,10 +275,10 @@ public class UserController {
 		addressRepo.delete(addressEntity);
 
 		if (removed)
-			return ResponseEntity.ok("Deleted 1 record");
+			return ResponseEntity.ok(new MessageResponse("deleted 1 record"));
 
 		else
-			return ResponseEntity.ok("Deleted 0 record");
+			return ResponseEntity.ok(new MessageResponse("deleted 0 record"));
 
 	}
 
@@ -291,7 +288,7 @@ public class UserController {
 			@RequestBody() AddressRequest addressRequest) {
 		AddressEntity addressEntity = addressRepo.findById(id).get();
 		if (addressEntity == null)
-			return new ResponseEntity<>("Address Id invalid!",
+			return new ResponseEntity<>("Address Id invalid",
 					HttpStatus.NOT_FOUND);
 
 		String line1 = addressRequest.getLine_1();
@@ -318,8 +315,7 @@ public class UserController {
 
 		UserEntity user = userRepo.findByEmail(email);
 		if (user == null)
-			return new ResponseEntity<>("User not found!",
-					HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>("user not found", HttpStatus.NOT_FOUND);
 
 		List<BookingResponse> bookingResponses = new ArrayList<BookingResponse>();
 		user.getBookings().forEach(booking -> {
@@ -360,7 +356,8 @@ public class UserController {
 
 	@PostMapping("user/{email}/booking")
 	public ResponseEntity<?> createBooking(@PathVariable("email") String email,
-			@RequestBody() BookingCreationRequest bookingCreationRequest) throws MessagingException, IOException {
+			@RequestBody() BookingCreationRequest bookingCreationRequest)
+			throws MessagingException, IOException {
 		Booking booking = setBooking(bookingCreationRequest);
 		Tutor handler = tutorRepo.findFirstByOrderByLastSelectedAsc();
 		booking.setHandler(handler);
@@ -379,16 +376,19 @@ public class UserController {
 		sendEmail(userEntity, handler);
 		return ResponseEntity.ok("Booking id : " + booking.getId());
 	}
-	
-	private void sendEmail(UserEntity userEntity, Tutor tutor) throws MessagingException, IOException {
+
+	private void sendEmail(UserEntity userEntity, Tutor tutor)
+			throws MessagingException, IOException {
 		String tutorEmail = tutor.getEmail();
 		String subject = "Notice for new Booking";
 		String userName = userEntity.getFname();
 		String userEmail = userEntity.getEmail();
-		emailService.sendMail(tutorEmail, subject, "<h4>A new Booking has been to you,"
-				+ tutor.getFname() + ".\nPlease review it urgently on yout dashboard.</h4>");
-		emailService.sendMail(userEmail, subject, "<h4>Thank you for choosing us, "
-				+ userName +".\nPlease check your bookings page for further info and SECRET to handle session.</h4>");
+		emailService.sendMail(tutorEmail, subject,
+				"<h4>A new Booking has been to you," + tutor.getFname()
+						+ ".\nPlease review it urgently on yout dashboard.</h4>");
+		emailService.sendMail(userEmail, subject,
+				"<h4>Thank you for choosing us, " + userName
+						+ ".\nPlease check your bookings page for further info and SECRET to handle session.</h4>");
 	}
 
 	private Booking setBooking(BookingCreationRequest bookingCreationRequest) {
@@ -446,7 +446,7 @@ public class UserController {
 			booking.setDeadline(new Date(date.getTime() - 1000 * 60 * 60 * 3));
 		}
 		bookingRepo.save(booking);
-		return ResponseEntity.ok("booking updated!");
+		return ResponseEntity.ok(new MessageResponse("booking updated"));
 
 	}
 
@@ -456,7 +456,7 @@ public class UserController {
 		Booking booking = bookingRepo.findById(id).get();
 
 		if (booking == null) {
-			return new ResponseEntity<>("Booking not found!",
+			return new ResponseEntity<>("booking not found",
 					HttpStatus.NOT_FOUND);
 		}
 		BookingResponse bookingResponse = new BookingResponse();
@@ -497,13 +497,12 @@ public class UserController {
 			@RequestBody() PhoneRequest phoneRequest) {
 		UserEntity userEntity = userRepo.findByEmail(email);
 		if (userEntity == null)
-			return new ResponseEntity<>("User not found!",
-					HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>("user not found", HttpStatus.NOT_FOUND);
 		Set<String> phonesList = userEntity.getPhones();
 		phonesList.add(phoneRequest.getPhone());
 		userEntity.setPhones(phonesList);
 		userRepo.save(userEntity);
-		return ResponseEntity.ok("New Phone Number added!");
+		return ResponseEntity.ok(new MessageResponse("new phone number added"));
 	}
 
 }

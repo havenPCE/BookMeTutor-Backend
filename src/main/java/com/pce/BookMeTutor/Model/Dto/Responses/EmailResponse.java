@@ -1,7 +1,7 @@
 package com.pce.BookMeTutor.Model.Dto.Responses;
 
 public class EmailResponse {
-	
+
 	private String message;
 
 	public EmailResponse(String message) {
@@ -25,6 +25,5 @@ public class EmailResponse {
 	public EmailResponse() {
 		super();
 	}
-	
-	
+
 }

@@ -305,7 +305,7 @@ public class UserController {
 		if (pincode != null)
 			addressEntity.setLine1(pincode);
 
-		return ResponseEntity.ok("address updated!");
+		return ResponseEntity.ok(new MessageResponse("address updated!"));
 
 	}
 
@@ -374,7 +374,7 @@ public class UserController {
 		handler.getBookings().add(booking);
 		tutorRepo.save(handler);
 		sendEmail(userEntity, handler);
-		return ResponseEntity.ok("Booking id : " + booking.getId());
+		return ResponseEntity.ok(new MessageResponse("Booking id : " + booking.getId()));
 	}
 
 	private void sendEmail(UserEntity userEntity, Tutor tutor)
@@ -420,7 +420,7 @@ public class UserController {
 		booking.setReason(cancellationRequest.getReason());
 		booking.setStatus("cancelled");
 		bookingRepo.save(booking);
-		return ResponseEntity.ok("Booking cancelled!");
+		return ResponseEntity.ok(new MessageResponse("Booking cancelled!"));
 	}
 
 	@PutMapping("user/{email}/booking/{id}")

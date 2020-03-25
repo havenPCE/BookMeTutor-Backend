@@ -444,6 +444,7 @@ public class UserController {
 		if (date != null) {
 			booking.setSchedule(date);
 			booking.setDeadline(new Date(date.getTime() - 1000 * 60 * 60 * 3));
+			booking.setRescheduled(true);
 		}
 		bookingRepo.save(booking);
 		return ResponseEntity.ok(new MessageResponse("booking updated"));
